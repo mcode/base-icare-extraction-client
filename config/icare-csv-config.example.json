@@ -1,0 +1,48 @@
+{
+  "patientIdCsvPath": "./data/csv/patient-mrns.csv",
+  "commonExtractorArgs": {},
+  "extractors": [
+    {
+      "label": "condition",
+      "type": "CSVConditionExtractor",
+      "constructorArgs": {
+        "filePath": "./data/csv/condition-information.csv"
+      }
+    },
+    {
+      "label": "patient",
+      "type": "CSVPatientExtractor",
+      "constructorArgs": {
+        "filePath": "./data/csv/patient-information.csv"
+      }
+    },
+    {
+      "label": "cancerDiseaseStatus",
+      "type": "CSVCancerDiseaseStatusExtractor",
+      "constructorArgs": {
+        "filePath": "./data/csv/cancer-disease-status-information.csv"
+      }
+    },
+    {
+      "label": "clinicalTrialInformation",
+      "type": "CSVClinicalTrialInformationExtractor",
+      "constructorArgs": {
+        "filePath": "./data/csv/clinical-trial-information.csv",
+        "clinicalSiteID": "example-site-id"
+      }
+    },
+    {
+      "label": "treatmentPlanChange",
+      "type": "CSVTreatmentPlanChangeExtractor",
+      "constructorArgs": {
+          "filePath": "./data/csv/treatment-plan-change-information.csv"
+      }
+    }
+  ],
+  "awsConfig": {
+    "baseURL": "http://example.com",
+    "clientId": "client_id",
+    "aud": "http://example.com/auth/realms/realm",
+    "jwk": {}
+  }
+}

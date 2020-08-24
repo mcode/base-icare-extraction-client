@@ -1,0 +1,4 @@
+mrn,conditionId,codeSystem,code
+123,conditionId-1,http://snomed.info/sct,363346000
+456,conditionId-2,http://snomed.info/sct,363346000
+789,conditionId-2,http://snomed.info/sct,363346000

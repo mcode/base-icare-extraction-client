@@ -1,0 +1,5 @@
+{
+  "awsConfig": "example-aws-config",
+  "patientIdCsvPath": "example-patient-id-csv-path",
+  "auth": "example-auth"
+}

@@ -1,0 +1,39 @@
+{
+  "name": "base-icare-extraction-client",
+  "version": "1.0.0",
+  "description": "",
+  "contributors": [
+    "Julia Afeltra <jafeltra@mitre.org>",
+    "Matthew Gramigna <mgramigna@mitre.org>",
+    "Daniel Lee <daniellee@mitre.org>",
+    "Dylan Mahalingam <kmahalingam@mitre.org>",
+    "Dylan Phelan <dphelan@mitre.org>"
+  ],
+  "main": "src/",
+  "scripts": {
+    "lint": "eslint \"./**/*.js\"",
+    "lint-fix": "eslint \"./**/*.js\" --fix",
+    "test": "cross-env LOGGING=none jest",
+    "test:watch": "cross-env LOGGING=none jest --watchAll"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "commander": "^4.1.1",
+    "cross-env": "^7.0.1",
+    "csv-parse": "^4.8.9",
+    "fhir-messaging-client": "git+https://github.com/ICAREdata/fhir-messaging-client.git",
+    "fhirpath": "^2.3.0",
+    "lodash": "^4.17.19",
+    "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git",
+    "moment": "^2.24.0",
+    "uuid": "^7.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.1",
+    "jest": "^25.1.0",
+    "jest-when": "^2.7.0",
+    "rewire": "^5.0.0"
+  }
+}
