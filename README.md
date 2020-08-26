@@ -28,7 +28,7 @@ npm upgrade <pkg-name>
 
 The ICARE Extraction Client uses the [mCODE Extraction Framework](https://github.com/mcode/mcode-extraction-framework) to extract ICAREdata elements through extractors.
 
-To use the ICARE Extraction Client, you will need to define a configuration file to specify what extractors to use and other basic information. An example configuration file can be found in [`config/icare-csv-config.example.json`](config/icare-csv-config.example.json). For more information, see [Configuration](#Configuration).
+To use the ICARE Extraction Client, you will need to define a configuration file to specify what extractors to use and other basic information. An example configuration file can be found in [`config/config.example.json`](config/config.example.json). For more information, see [Configuration](#Configuration).
 
 Once you have a configuration file, you can use the ICARE Extraction client by running the following:
 
