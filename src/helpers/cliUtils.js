@@ -125,7 +125,6 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
   try {
     if (debug) logger.level = 'debug';
     checkLogFile(pathToRunLogs);
-    console.log('pathToConfig: ', pathToConfig);
     const config = getConfig(pathToConfig);
     checkConfig(config, fromDate, toDate);
     const icareClient = new Client(config);

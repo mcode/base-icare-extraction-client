@@ -5,7 +5,6 @@ const { app } = require('./helpers/cliUtils');
 
 const defaultPathToConfig = path.join('config', 'csv.config.json');
 const defaultPathToRunLogs = path.join('logs', 'run-logs.json');
-console.log('defaultPathToRunLogs: ', defaultPathToRunLogs);
 
 program
   .usage('[options]')
