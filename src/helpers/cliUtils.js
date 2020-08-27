@@ -5,7 +5,7 @@ const moment = require('moment');
 const MessagingClient = require('fhir-messaging-client');
 const { logger } = require('mcode-extraction-framework');
 const { RunInstanceLogger } = require('../RunInstanceLogger');
-const { getResourceCountInBundle } = require('../icareBundling');
+const { getResourceCountInBundle } = require('./icareBundling');
 
 // Check input args and needed config variables based on client being used
 function checkConfig(config, fromDate, toDate) {

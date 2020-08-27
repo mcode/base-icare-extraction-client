@@ -1,5 +1,5 @@
 const { app } = require('./helpers/cliUtils');
-const { generateNewMessageBundle } = require('./icareBundling');
+const { generateNewMessageBundle } = require('./helpers/icareBundling');
 
 module.exports = {
   app,
