@@ -91,18 +91,22 @@ async function extractDataForPatients(auth, config, patientIds, icareClient, mes
   /* eslint-disable no-await-in-loop */
   // Track if these runs were successful; if not, don't log a new RunInstance
   let successfulRun = true;
+  const errors = {};
   for (const [index, mrn] of patientIds.entries()) {
+    errors[index] = [];
     try {
       logger.info(`Extracting information for patient at row ${index + 1} in .csv file`);
-      const response = await icareClient.get({ mrn, fromDate: effectiveFromDate, toDate });
-      const resourceCount = getResourceCountInBundle(response);
+      const { bundle, extractionErrors } = await icareClient.get({ mrn, fromDate: effectiveFromDate, toDate });
+      errors[index].push(...extractionErrors);
+      const resourceCount = getResourceCountInBundle(bundle);
       logger.info(`Resources extracted for patient ${index + 1} in .csv file`);
       Object.keys(resourceCount).forEach((resourceType) => logger.info(`${resourceType}: ${resourceCount[resourceType]} extracted`));
       try {
-        await messagingClient.processMessage(response);
+        await messagingClient.processMessage(bundle);
         logger.info(`SUCCESS - sent message for patient at row ${index + 1}`);
       } catch (e) {
         successfulRun = false;
+        errors[index].push(e);
         const violation = JSON.parse(e.response.data.errorMessage);
         const violationText = violation.entry[1].resource.issue.details.text;
         logger.error(`ERROR - could not send message for patient at row ${index + 1} - ${e.message} - ${violationText}`);
@@ -110,6 +114,7 @@ async function extractDataForPatients(auth, config, patientIds, icareClient, mes
       }
     } catch (err) {
       successfulRun = false;
+      errors[index].push(err);
       logger.error(`Error extracting data: ${err.message}`);
       logger.debug(err.stack);
     }
@@ -119,9 +124,13 @@ async function extractDataForPatients(auth, config, patientIds, icareClient, mes
     logger.info('Logging successful run information to records');
     runLogger.addRun(effectiveFromDate, toDate);
   }
+
+  return errors;
 }
 
 async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, auth) {
+  let errors = {};
+
   try {
     if (debug) logger.level = 'debug';
     checkLogFile(pathToRunLogs);
@@ -139,12 +148,18 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
     const effectiveFromDate = getEffectiveFromDate(fromDate, runLogger);
 
     logger.info(`Extracting data for ${patientIds.length} patients`);
-    await extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, toDate);
+    errors = await extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, toDate);
   } catch (e) {
     logger.error(e.message);
     logger.debug(e.stack);
     process.exit(1);
   }
+
+  // log errors for each patient
+  Object.keys(errors).forEach((index) => {
+    logger.debug(`Errors for patient at row ${parseInt(index, 10) + 1} in .csv file:`);
+    errors[index].forEach((e) => logger.debug(e.message.trim()));
+  });
 }
 
 module.exports = {
