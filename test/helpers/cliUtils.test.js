@@ -125,7 +125,7 @@ describe('cliUtils', () => {
     it('should log a successful run when icare client successful returns a message bundle', async () => {
       mockIcareClient.get.mockClear();
       mockRunLogger.addRun.mockClear();
-      mockIcareClient.get.mockReturnValue(testBundle);
+      mockIcareClient.get.mockReturnValue({ bundle: testBundle, extractionErrors: [] });
       mockMessagingClient.canSendMessage.mockReturnValue(true);
       await expect(extractDataForPatients(true, testConfig, testPatientIds, mockIcareClient, mockMessagingClient, mockRunLogger, testFromDate, testToDate)).resolves.not.toThrowError();
       expect(mockIcareClient.get).toHaveBeenCalledTimes(testPatientIds.length);
