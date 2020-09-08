@@ -22,8 +22,8 @@ class ICARECSVClient extends BaseClient {
   }
 
   async get(args) {
-    const bundle = await super.get(args);
-    return generateNewMessageBundle(bundle);
+    const { bundle, extractionErrors } = await super.get(args);
+    return { bundle: generateNewMessageBundle(bundle), extractionErrors };
   }
 }
 

@@ -33,30 +33,30 @@ condExtractorGetSpy
 
 describe('ICAREClient', () => {
   test('get returns a valid message bundle', async () => {
-    const data = await icareClient.get({
+    const { bundle } = await icareClient.get({
       mrn: MOCK_PATIENT_MRN,
       fromDate: MOCK_FROM_DATE,
       toDate: MOCK_TO_DATE,
     });
-    expect(data.resourceType).toEqual('Bundle');
-    expect(data.type).toEqual('message');
-    expect(data.timestamp).toEqual(moment().format('YYYY-MM-DDThh:mm:ssZ'));
-    expect(data.entry).toBeDefined();
-    expect(data.entry[0].resource.resourceType).toEqual('MessageHeader');
-    expect(data.entry[1].resource.resourceType).toEqual('Bundle');
-    expect(data.entry[1].resource.type).toEqual('collection');
+    expect(bundle.resourceType).toEqual('Bundle');
+    expect(bundle.type).toEqual('message');
+    expect(bundle.timestamp).toEqual(moment().format('YYYY-MM-DDThh:mm:ssZ'));
+    expect(bundle.entry).toBeDefined();
+    expect(bundle.entry[0].resource.resourceType).toEqual('MessageHeader');
+    expect(bundle.entry[1].resource.resourceType).toEqual('Bundle');
+    expect(bundle.entry[1].resource.type).toEqual('collection');
     // Bundle-length should be 2 - 1 header and 1 collection resource
-    expect(data.entry.length).toEqual(2);
+    expect(bundle.entry.length).toEqual(2);
     // messageHeader id should match messageHeader fullURLId
-    expect(data.entry[0].resource.id).toEqual(data.entry[0].fullUrl.split(':')[2]);
+    expect(bundle.entry[0].resource.id).toEqual(bundle.entry[0].fullUrl.split(':')[2]);
     // messageBody id should match messageBody fullURLId
-    expect(data.entry[1].resource.id).toEqual(data.entry[1].fullUrl.split(':')[2]);
+    expect(bundle.entry[1].resource.id).toEqual(bundle.entry[1].fullUrl.split(':')[2]);
     // messageBody id should match messageHeader focus
-    expect(data.entry[1].resource.id).toEqual(data.entry[0].resource.focus[0].reference.split(':')[2]);
+    expect(bundle.entry[1].resource.id).toEqual(bundle.entry[0].resource.focus[0].reference.split(':')[2]);
   });
 
   test('get returns a bundle containing all our example entries', async () => {
-    const data = await icareClient.get({
+    const { bundle } = await icareClient.get({
       mrn: MOCK_PATIENT_MRN,
       fromDate: MOCK_FROM_DATE,
       toDate: MOCK_TO_DATE,
@@ -64,7 +64,7 @@ describe('ICAREClient', () => {
     // Collection bundle has all expected entries, and no more than that
     const resourceTotal = exampleCondition.entry.length;
 
-    expect(data.entry[1].resource.entry.length).toEqual(resourceTotal);
-    expect(data.entry[1].resource.entry).toEqual(expect.arrayContaining([exampleCondition.entry[0]]));
+    expect(bundle.entry[1].resource.entry.length).toEqual(resourceTotal);
+    expect(bundle.entry[1].resource.entry).toEqual(expect.arrayContaining([exampleCondition.entry[0]]));
   });
 });
