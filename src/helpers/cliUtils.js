@@ -151,8 +151,9 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
     logger.info(`Extracting data for ${patientIds.length} patients`);
     errors = await extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, toDate);
 
+    const totalErrors = Object.keys(errors).reduce((previousValue, currentValue) => previousValue += errors[currentValue].length, 0);
     const { notificationInfo } = config;
-    if (notificationInfo) {
+    if (notificationInfo && totalErrors > 0) {
       if (!notificationInfo.from || !notificationInfo.to || !notificationInfo.host || !notificationInfo.port) {
         throw new Error('Notification information incomplete. Unable to send email.')
       }

@@ -76,6 +76,14 @@ Each extractor uses various methods to gather data and format that data into [mC
 - [cancer disease status](http://hl7.org/fhir/us/mcode/StructureDefinition-mcode-cancer-disease-status.html)
 - [care plan with review](http://standardhealthrecord.org/guides/icare/StructureDefinition-icare-care-plan-with-review.html)
 
+## Email Notification
+
+The ICARE Extraction Client supports sending an email using the SMTP protocol when there are errors during data extraction.
+In order to send an email, users must specify the hostname or IP address of an SMTP server to connect to, the port to connect to, the email addresses to send the email to, and the email address to send from. These fields must be specified in the `notificationInfo` object in the configuration file.
+An example of this object can be found in [`config/icare-csv-config.example.json`](config/icare-csv-config.example.json).
+
+If the `notificationInfo` object is provided in configuration, an email will be sent using the specified options if any errors occur during data extraction. If any fields are missing in the object (`host`, `port`, `to`, or `from`), an email cannot be sent. If you prefer to not have email sent even if errors occur, you can choose to not include the `notificationInfo` object in your configuration file.
+
 ## CSV Extraction
 
 In order to extract data elements from CSV files, in addition to the specifications above, your configuration file _must_ use the appropriate CSV Extractors for ICAREdata resources. An example configuration that specifies each extractor and its required configuration can be found in [`config/icare-csv-config.example.json`](config/icare-csv-config.example.json).

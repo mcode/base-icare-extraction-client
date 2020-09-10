@@ -10,6 +10,12 @@
       "type": "example_userid_type"
     }
   },
+  "notificationInfo": {
+    "host": "smtp.example.com",
+    "port": 587,
+    "from": "sender@example.com",
+    "to": ["demo@example.com", "test@example.com"]
+  },
   "extractors": [
     {
       "label": "Display Label for Extractor",
