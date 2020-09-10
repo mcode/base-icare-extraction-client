@@ -4,7 +4,7 @@ The ICAREdata Extraction Client supports extracting the data elements required f
 
 ## Prerequisites for Use
 
-ICARE Extraction Client requires that [Node.js](https://nodejs.org/en/) is installed on the user's system. Node.js 10 or later is supported. Users will also need to have all dependencies installed. If this tool is packaged with all required dependencies in a `node_modules` folder, nothing new needs to be installed. If not, run:
+ICARE Extraction Client requires that [Node.js](https://nodejs.org/en/) is installed on the user's system. Node.js 12 or later is supported. Users will also need to have all dependencies installed. If this tool is packaged with all required dependencies in a `node_modules` folder, nothing new needs to be installed. If not, run:
 
 ```bash
 npm install
