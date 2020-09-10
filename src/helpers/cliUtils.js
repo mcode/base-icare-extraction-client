@@ -129,6 +129,43 @@ async function extractDataForPatients(auth, config, patientIds, icareClient, mes
   return errors;
 }
 
+async function sendEmailNotification(notificationInfo, errors) {
+  const totalErrors = Object.keys(errors).reduce((previousValue, currentValue) => previousValue + errors[currentValue].length, 0);
+  if (totalErrors === 0) {
+    return;
+  }
+
+  if (!notificationInfo.from || !notificationInfo.to || !notificationInfo.host || !notificationInfo.port) {
+    throw new Error('Notification information incomplete. Unable to send email.');
+  }
+
+  // Aggregate errors and build email message
+  let emailBody = 'Thank you for using the mCODE Extraction client, provided by the STEAM team. ';
+  emailBody += 'Unfortunately, the following errors occurred when running the extraction client:\n\n';
+  Object.keys(errors).forEach((patientRow) => {
+    emailBody += `Errors for patient at row ${parseInt(patientRow, 10) + 1} in .csv file:\n\n`;
+    errors[patientRow].forEach((e) => { emailBody += `${e.message.trim()}\n`; });
+    if (errors[patientRow].length === 0) {
+      emailBody += 'No errors for this patient. Extraction was successful.\n';
+    }
+    emailBody += '\n===================================================\n\n';
+  });
+  emailBody += 'For more information about these errors, run the extraction client using the `--debug` flag';
+
+  const transporter = nodemailer.createTransport({
+    host: notificationInfo.host,
+    port: notificationInfo.port,
+  });
+
+  logger.debug('Sending email with error information');
+  await transporter.sendMail({
+    from: notificationInfo.from,
+    to: notificationInfo.to,
+    subject: 'mCODE Extraction Client errors',
+    text: emailBody,
+  });
+}
+
 async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, auth) {
   let errors = {};
 
@@ -151,38 +188,9 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
     logger.info(`Extracting data for ${patientIds.length} patients`);
     errors = await extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, toDate);
 
-    const totalErrors = Object.keys(errors).reduce((previousValue, currentValue) => previousValue += errors[currentValue].length, 0);
     const { notificationInfo } = config;
-    if (notificationInfo && totalErrors > 0) {
-      if (!notificationInfo.from || !notificationInfo.to || !notificationInfo.host || !notificationInfo.port) {
-        throw new Error('Notification information incomplete. Unable to send email.')
-      }
-
-      // Aggregate errors
-      let emailBody = 'Thank you for using the mCODE Extraction client, provided by the STEAM team. '
-      emailBody += 'Unfortunately, the following errors occurred when running the extraction client:\n\n';
-      Object.keys(errors).forEach((patientRow, i) => {
-        emailBody += `Errors for patient at row ${parseInt(patientRow, 10) + 1} in .csv file:\n\n`;
-        errors[patientRow].forEach((e) => emailBody += `${e.message.trim()}\n`);
-        if (errors[patientRow].length === 0) {
-          emailBody += 'No errors for this patient. Extraction was successful.\n'
-        }
-        emailBody += '\n===================================================\n\n';
-      });
-      emailBody += 'For more information about these errors, run the extraction client using the `--debug` flag';
-
-      let transporter = nodemailer.createTransport({
-        host: notificationInfo.host,
-        port: notificationInfo.port
-      });
-
-      logger.debug('Sending email with error information');
-      await transporter.sendMail({
-        from: notificationInfo.from,
-        to: notificationInfo.to,
-        subject: "mCODE Extraction Client errors",
-        text: emailBody
-      });
+    if (notificationInfo) {
+      await sendEmailNotification(notificationInfo, errors);
     }
   } catch (e) {
     logger.error(e.message);
