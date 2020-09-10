@@ -2,6 +2,7 @@ const parse = require('csv-parse/lib/sync');
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
+const nodemailer = require('nodemailer');
 const MessagingClient = require('fhir-messaging-client');
 const { logger } = require('mcode-extraction-framework');
 const { RunInstanceLogger } = require('../RunInstanceLogger');
@@ -149,17 +150,44 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
 
     logger.info(`Extracting data for ${patientIds.length} patients`);
     errors = await extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, toDate);
+
+    const { notificationInfo } = config;
+    if (notificationInfo) {
+      if (!notificationInfo.from || !notificationInfo.to || !notificationInfo.host || !notificationInfo.port) {
+        throw new Error('Notification information incomplete. Unable to send email.')
+      }
+
+      // Aggregate errors
+      let emailBody = 'Thank you for using the mCODE Extraction client, provided by the STEAM team. '
+      emailBody += 'Unfortunately, the following errors occurred when running the extraction client:\n\n';
+      Object.keys(errors).forEach((patientRow, i) => {
+        emailBody += `Errors for patient at row ${parseInt(patientRow, 10) + 1} in .csv file:\n\n`;
+        errors[patientRow].forEach((e) => emailBody += `${e.message.trim()}\n`);
+        if (errors[patientRow].length === 0) {
+          emailBody += 'No errors for this patient. Extraction was successful.\n'
+        }
+        emailBody += '\n===================================================\n\n';
+      });
+      emailBody += 'For more information about these errors, run the extraction client using the `--debug` flag';
+
+      let transporter = nodemailer.createTransport({
+        host: notificationInfo.host,
+        port: notificationInfo.port
+      });
+
+      logger.debug('Sending email with error information');
+      await transporter.sendMail({
+        from: notificationInfo.from,
+        to: notificationInfo.to,
+        subject: "mCODE Extraction Client errors",
+        text: emailBody
+      });
+    }
   } catch (e) {
     logger.error(e.message);
     logger.debug(e.stack);
     process.exit(1);
   }
-
-  // log errors for each patient
-  Object.keys(errors).forEach((index) => {
-    logger.debug(`Errors for patient at row ${parseInt(index, 10) + 1} in .csv file:`);
-    errors[index].forEach((e) => logger.debug(e.message.trim()));
-  });
 }
 
 module.exports = {
