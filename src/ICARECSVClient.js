@@ -19,7 +19,8 @@ class ICARECSVClient extends BaseClient {
       CSVTreatmentPlanChangeExtractor,
     );
 
-    commonExtractorArgs.implementation = commonExtractorArgs.implementation ? commonExtractorArgs.implementation : 'icare';
+    this.commonExtractorArgs = commonExtractorArgs;
+    this.commonExtractorArgs.implementation = commonExtractorArgs.implementation ? commonExtractorArgs.implementation : 'icare';
     this.initializeExtractors(extractors, commonExtractorArgs);
   }
 
