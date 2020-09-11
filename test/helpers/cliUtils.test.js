@@ -11,9 +11,13 @@ const checkLogFile = cliUtils.__get__('checkLogFile');
 const getConfig = cliUtils.__get__('getConfig');
 const getEffectiveFromDate = cliUtils.__get__('getEffectiveFromDate');
 const extractDataForPatients = cliUtils.__get__('extractDataForPatients');
+const sendEmailNotification = cliUtils.__get__('sendEmailNotification');
+// Not entirely sure why nodemailer can't be imported directly and must be imported this way
+const nodemailer = cliUtils.__get__('nodemailer');
 /* eslint-enable no-underscore-dangle */
 const pathToConfig = 'test/helpers/fixtures/test-config.json';
 const fsSpy = jest.spyOn(fs, 'readFileSync');
+const createTransportSpy = jest.spyOn(nodemailer, 'createTransport');
 const mockRunLogger = jest.fn().mockImplementation(() => ({
   getMostRecentToDate: jest.fn(),
   addRun: jest.fn(),
@@ -164,6 +168,68 @@ describe('cliUtils', () => {
       });
       await expect(checkMessagingClient(mockMessagingClient)).rejects.toThrowError(`Could not authorize messaging client - ${errorMsg}`);
       mockMessagingClient.authorize.mockReset();
+    });
+  });
+
+  describe('sendEmailNotification', () => {
+    const sendMailMock = jest.fn();
+    beforeEach(() => {
+      sendMailMock.mockClear();
+      createTransportSpy.mockClear();
+    });
+
+    it('should not send an email if there are no errors for any patient', async () => {
+      const notificationInfo = {};
+      const errors = {
+        0: [],
+        1: [],
+        2: [],
+      };
+
+      await expect(sendEmailNotification(notificationInfo, errors)).resolves.not.toThrow();
+      expect(createTransportSpy).not.toBeCalled();
+      expect(sendMailMock).not.toBeCalled();
+    });
+
+    it('should throw an error when missing required notification options', async () => {
+      const invalidNotificationInfo = {
+        host: 'my.host.com',
+      };
+      const errors = {
+        0: [],
+        1: [{ message: 'something bad' }],
+        2: [{ message: 'an error' }, { message: 'another error' }],
+      };
+
+      const errorMessage = 'Notification information incomplete. Unable to send email.';
+      await expect(sendEmailNotification(invalidNotificationInfo, errors)).rejects.toThrowError(errorMessage);
+      expect(createTransportSpy).not.toBeCalled();
+      expect(sendMailMock).not.toBeCalled();
+    });
+
+    it('should send an email according to config options with errors in the body', async () => {
+      createTransportSpy.mockReturnValueOnce({ sendMail: sendMailMock });
+      const notificationInfo = {
+        host: 'my.host.com',
+        port: 123,
+        to: ['something@example.com', 'someone@example.com'],
+        from: 'other@example.com',
+      };
+      const errors = {
+        0: [],
+        1: [{ message: 'something bad' }],
+        2: [{ message: 'an error' }, { message: 'another error' }],
+      };
+
+      await expect(sendEmailNotification(notificationInfo, errors)).resolves.not.toThrow();
+      expect(createTransportSpy).toBeCalledWith({ host: notificationInfo.host, port: notificationInfo.port });
+      expect(sendMailMock).toBeCalled();
+      const sendMailMockArgs = sendMailMock.mock.calls[0][0];
+      expect(sendMailMockArgs.to).toEqual(notificationInfo.to);
+      expect(sendMailMockArgs.from).toEqual(notificationInfo.from);
+      expect(sendMailMockArgs.subject).toEqual('mCODE Extraction Client Errors');
+      expect(sendMailMockArgs.text).toMatch(/something bad/i);
+      expect(sendMailMockArgs.text).toMatch(/another error/i);
     });
   });
 });

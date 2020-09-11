@@ -161,7 +161,7 @@ async function sendEmailNotification(notificationInfo, errors) {
   await transporter.sendMail({
     from: notificationInfo.from,
     to: notificationInfo.to,
-    subject: 'mCODE Extraction Client errors',
+    subject: 'mCODE Extraction Client Errors',
     text: emailBody,
   });
 }
