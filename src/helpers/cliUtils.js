@@ -148,9 +148,9 @@ async function sendEmailNotification(notificationInfo, errors) {
     if (errors[patientRow].length === 0) {
       emailBody += 'No errors for this patient. Extraction was successful.\n';
     }
-    emailBody += '\n===================================================\n\n';
+    emailBody += '\n============================================================\n\n';
   });
-  emailBody += 'For more information about these errors, run the extraction client using the `--debug` flag';
+  emailBody += 'For more information about these errors, run the extraction client using the `--debug` flag.';
 
   const transporter = nodemailer.createTransport({
     host: notificationInfo.host,
