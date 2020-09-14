@@ -129,28 +129,37 @@ async function extractDataForPatients(auth, config, patientIds, icareClient, mes
   return errors;
 }
 
-async function sendEmailNotification(notificationInfo, errors) {
+async function sendEmailNotification(notificationInfo, errors, debug) {
   const totalErrors = Object.keys(errors).reduce((previousValue, currentValue) => previousValue + errors[currentValue].length, 0);
   if (totalErrors === 0) {
     return;
   }
 
   if (!notificationInfo.from || !notificationInfo.to || !notificationInfo.host || !notificationInfo.port) {
-    throw new Error('Notification information incomplete. Unable to send email.');
+    const errorMessage = `Email notification information incomplete. Unable to send email with ${totalErrors} errors.`
+      + 'Update notificationInfo object in configuration in order to receive emails when errors occur.';
+    throw new Error(errorMessage);
   }
 
   // Aggregate errors and build email message
-  let emailBody = 'Thank you for using the mCODE Extraction client, provided by the STEAM team. ';
+  let emailBody = 'Thank you for using the mCODE Extraction client. ';
   emailBody += 'Unfortunately, the following errors occurred when running the extraction client:\n\n';
   Object.keys(errors).forEach((patientRow) => {
     emailBody += `Errors for patient at row ${parseInt(patientRow, 10) + 1} in .csv file:\n\n`;
-    errors[patientRow].forEach((e) => { emailBody += `${e.message.trim()}\n`; });
+    errors[patientRow].forEach((e) => {
+      emailBody += `${e.message.trim()}\n`;
+      if (debug) emailBody += `${e.stack}\n\n`;
+    });
     if (errors[patientRow].length === 0) {
       emailBody += 'No errors for this patient. Extraction was successful.\n';
     }
     emailBody += '\n============================================================\n\n';
   });
-  emailBody += 'For more information about these errors, run the extraction client using the `--debug` flag.';
+
+  if (!debug) {
+    emailBody += 'For additional stack trace information about these errors, run the extraction client using the `--debug` flag. ';
+    emailBody += 'The stack trace information can be seen in the terminal as well as in the notification email.';
+  }
 
   const transporter = nodemailer.createTransport({
     host: notificationInfo.host,
@@ -190,7 +199,7 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
 
     const { notificationInfo } = config;
     if (notificationInfo) {
-      await sendEmailNotification(notificationInfo, errors);
+      await sendEmailNotification(notificationInfo, errors, debug);
     }
   } catch (e) {
     logger.error(e.message);

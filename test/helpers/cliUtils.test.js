@@ -201,7 +201,7 @@ describe('cliUtils', () => {
         2: [{ message: 'an error' }, { message: 'another error' }],
       };
 
-      const errorMessage = 'Notification information incomplete. Unable to send email.';
+      const errorMessage = 'Email notification information incomplete. Unable to send email with 3 errors.';
       await expect(sendEmailNotification(invalidNotificationInfo, errors)).rejects.toThrowError(errorMessage);
       expect(createTransportSpy).not.toBeCalled();
       expect(sendMailMock).not.toBeCalled();
