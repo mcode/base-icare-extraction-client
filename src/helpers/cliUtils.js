@@ -135,14 +135,20 @@ async function sendEmailNotification(notificationInfo, errors, debug) {
     return;
   }
 
-  if (!notificationInfo.from || !notificationInfo.to || !notificationInfo.host || !notificationInfo.port) {
+  if (!notificationInfo.to || !notificationInfo.host) {
     const errorMessage = `Email notification information incomplete. Unable to send email with ${totalErrors} errors.`
       + 'Update notificationInfo object in configuration in order to receive emails when errors occur.';
     throw new Error(errorMessage);
   }
 
   // Aggregate errors and build email message
-  let emailBody = 'Thank you for using the mCODE Extraction client. ';
+  let emailBody = '';
+  const fromAddress = notificationInfo.from || 'mCODE Extraction Errors mcode-extraction-errors@mitre.org';
+  if (fromAddress.includes('mcode-extraction-errors@mitre.org')) {
+    emailBody += '[This is an automated email from the mCODE Extraction Client. Do not reply to this message.]\n\n';
+  }
+
+  emailBody += 'Thank you for using the mCODE Extraction Client. ';
   emailBody += 'Unfortunately, the following errors occurred when running the extraction client:\n\n';
   Object.keys(errors).forEach((patientRow) => {
     emailBody += `Errors for patient at row ${parseInt(patientRow, 10) + 1} in .csv file:\n\n`;
@@ -163,12 +169,12 @@ async function sendEmailNotification(notificationInfo, errors, debug) {
 
   const transporter = nodemailer.createTransport({
     host: notificationInfo.host,
-    port: notificationInfo.port,
+    ...(notificationInfo.port && { port: notificationInfo.port }),
   });
 
   logger.debug('Sending email with error information');
   await transporter.sendMail({
-    from: notificationInfo.from,
+    from: fromAddress,
     to: notificationInfo.to,
     subject: 'mCODE Extraction Client Errors',
     text: emailBody,
