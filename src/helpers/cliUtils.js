@@ -188,7 +188,7 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
     if (debug) logger.level = 'debug';
     checkLogFile(pathToRunLogs);
     const config = getConfig(pathToConfig);
-    if (typeof config.commonExtractorArgs === 'undefined') { config.commonExtractorArgs = {}; }
+    if (!config.commonExtractorArgs) config.commonExtractorArgs = {};
     checkConfig(config, fromDate, toDate);
     const icareClient = new Client(config);
 
