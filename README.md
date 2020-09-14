@@ -79,6 +79,7 @@ Each extractor uses various methods to gather data and format that data into [mC
 ## Email Notification
 
 The ICARE Extraction Client supports sending an email using the SMTP protocol when there are errors during data extraction.
+The connection to the SMTP server is considered authenticated from the start. Currently, there is no support for providing authentication information separately through configuration.
 In order to send an email, users must specify the hostname or IP address of an SMTP server to connect to, the port to connect to, the email addresses to send the email to, and the email address to send from. These fields must be specified in the `notificationInfo` object in the configuration file.
 An example of this object can be found in [`config/icare-csv-config.example.json`](config/icare-csv-config.example.json).
 
