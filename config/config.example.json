@@ -8,8 +8,7 @@
     "userId": {
       "id": "example_userid",
       "type": "example_userid_type"
-    },
-    "implementation": "icare"
+    }
   },
   "notificationInfo": {
     "host": "smtp.example.com",

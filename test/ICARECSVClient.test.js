@@ -20,7 +20,6 @@ const testConfig = {
       },
     },
   ],
-  commonExtractorArgs: {},
 };
 
 const icareClient = new ICARECSVClient(testConfig);
