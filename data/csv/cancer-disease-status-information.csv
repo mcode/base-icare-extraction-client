@@ -1,4 +1,4 @@
-mrn,conditionId,evidence,diseaseStatus,dateOfObservation,dateRecorded
-123,conditionId-1,363679005|252416005,268910001,2019-12-02,2020-01-10
-456,conditionId-2,363679005,359746009,2020-01-12,2020-01-12
-789,conditionId-2,,709137006,2020-04-22,2020-06-17
+mrn,conditionId,diseaseStatusCode,diseaseStatusText,dateOfObservation,evidence,observationStatus
+123,conditionId-1,268910001,responding,2019-12-02,363679005|252416005,preliminary
+456,conditionId-2,359746009,stable,2020-01-12,363679005,amended
+789,conditionId-2,709137006,not evaluated,2020-04-22,252416005,final

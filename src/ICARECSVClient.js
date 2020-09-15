@@ -18,7 +18,12 @@ class ICARECSVClient extends BaseClient {
       CSVPatientExtractor,
       CSVTreatmentPlanChangeExtractor,
     );
-    this.initializeExtractors(extractors, commonExtractorArgs);
+
+    this.commonExtractorArgs = {
+      implementation: 'icare',
+      ...commonExtractorArgs,
+    };
+    this.initializeExtractors(extractors, this.commonExtractorArgs);
   }
 
   async get(args) {
