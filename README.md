@@ -84,9 +84,9 @@ The connection to the SMTP server is considered authenticated from the start. Cu
 In order to send an email, users must specify the hostname or IP address of an SMTP server to connect to and the email addresses to send the email to. Optionally, users can specify the port to connect to and the email address to send from. These fields must be specified in the `notificationInfo` object in the configuration file. Below is more information on each field that can be specified. Further information can be found in the [`nodemailer` documentation](https://nodemailer.com/) for the [SMTP transport](https://nodemailer.com/smtp/) and [message configuration](https://nodemailer.com/message/).
 
 - `host`: The hostname or IP address of an SMTP server to connect to
-- `port`: The port to connect to (defaults to 587 if is secure is false or 465 if true)
+- `port`: (Optional) The port to connect to (defaults to 587)
 - `to`: Comma separated list or an array of recipients email addresses that will appear on the _To:_ field
-- `from`: The email address of the sender. All email addresses can be plain `'sender@server.com'` or formatted `'"Sender Name" sender@server.com'` (defaults to mcode-extraction-errors@mitre.org, which cannot receive reply emails)
+- `from`: (Optional) The email address of the sender. All email addresses can be plain `'sender@server.com'` or formatted `'"Sender Name" sender@server.com'` (defaults to mcode-extraction-errors@mitre.org, which cannot receive reply emails)
 
 An example of this object can be found in [`config/icare-csv-config.example.json`](config/icare-csv-config.example.json).
 
