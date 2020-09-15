@@ -10,13 +10,14 @@ program
   .usage('[options]')
   .option('-f --from-date <date>', 'The earliest date and time to search')
   .option('-t --to-date <date>', 'The latest date and time to search')
+  .option('-n, --date-flag', 'Flag to indicate not to filter data by date')
   .option('-p --path-to-config <path>', 'Specify relative path to config to use:', defaultPathToConfig)
   .option('-l --path-to-run-logs <path>', 'Specify relative path to log file of previous runs:', defaultPathToRunLogs)
   .option('-d, --debug', 'output extra debugging information')
   .parse(process.argv);
 
 const {
-  fromDate, toDate, pathToConfig, pathToRunLogs, debug,
+  fromDate, toDate, pathToConfig, pathToRunLogs, debug, dateFlag,
 } = program;
 
-app(ICARECSVClient, fromDate, toDate, pathToConfig, pathToRunLogs, debug);
+app(ICARECSVClient, fromDate, toDate, pathToConfig, pathToRunLogs, debug, null, dateFlag);

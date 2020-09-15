@@ -122,8 +122,11 @@ async function extractDataForPatients(auth, config, patientIds, icareClient, mes
   }
 
   if (successfulRun) {
-    logger.info('Logging successful run information to records');
-    runLogger.addRun(effectiveFromDate, toDate);
+    // Do not log run if no effective from date
+    if (effectiveFromDate) {
+      logger.info('Logging successful run information to records');
+      runLogger.addRun(effectiveFromDate, toDate);
+    }
   }
 
   return errors;
@@ -181,7 +184,7 @@ async function sendEmailNotification(notificationInfo, errors, debug) {
   });
 }
 
-async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, auth) {
+async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, auth, dateFlag) {
   let errors = {};
 
   try {
@@ -198,7 +201,7 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
     const messagingClient = new MessagingClient(config.awsConfig);
     // Get RunInstanceLogger for recording new runs and inferring dates from previous runs
     const runLogger = new RunInstanceLogger(pathToRunLogs);
-    const effectiveFromDate = getEffectiveFromDate(fromDate, runLogger);
+    const effectiveFromDate = dateFlag ? null : getEffectiveFromDate(fromDate, runLogger);
 
     logger.info(`Extracting data for ${patientIds.length} patients`);
     errors = await extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, toDate);
