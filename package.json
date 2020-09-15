@@ -26,6 +26,7 @@
     "lodash": "^4.17.19",
     "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git",
     "moment": "^2.24.0",
+    "nodemailer": "^6.4.11",
     "uuid": "^7.0.2"
   },
   "devDependencies": {

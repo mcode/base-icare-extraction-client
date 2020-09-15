@@ -1,6 +1,12 @@
 {
   "patientIdCsvPath": "./data/csv/patient-mrns.csv",
   "commonExtractorArgs": {},
+  "notificationInfo": {
+    "host": "smtp.example.com",
+    "port": 587,
+    "from": "sender@example.com",
+    "to": ["demo@example.com", "test@example.com"]
+  },
   "extractors": [
     {
       "label": "condition",
