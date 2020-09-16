@@ -81,7 +81,7 @@ function getEffectiveFromDate(fromDate, runLogger) {
   return effectiveFromDate;
 }
 
-async function extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, toDate) {
+async function extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, fromDate, toDate) {
   if (auth) {
     await icareClient.initAuth(config.auth);
   }
@@ -97,7 +97,7 @@ async function extractDataForPatients(auth, config, patientIds, icareClient, mes
     errors[index] = [];
     try {
       logger.info(`Extracting information for patient at row ${index + 1} in .csv file`);
-      const { bundle, extractionErrors } = await icareClient.get({ mrn, fromDate: effectiveFromDate, toDate });
+      const { bundle, extractionErrors } = await icareClient.get({ mrn, fromDate, toDate });
       errors[index].push(...extractionErrors);
       const resourceCount = getResourceCountInBundle(bundle);
       logger.info(`Resources extracted for patient ${index + 1} in .csv file`);
@@ -122,8 +122,11 @@ async function extractDataForPatients(auth, config, patientIds, icareClient, mes
   }
 
   if (successfulRun) {
-    logger.info('Logging successful run information to records');
-    runLogger.addRun(effectiveFromDate, toDate);
+    // Do not log run if no effective from date
+    if (fromDate) {
+      logger.info('Logging successful run information to records');
+      runLogger.addRun(fromDate, toDate);
+    }
   }
 
   return errors;
@@ -181,7 +184,7 @@ async function sendEmailNotification(notificationInfo, errors, debug) {
   });
 }
 
-async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, auth) {
+async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, auth, allEntries) {
   let errors = {};
 
   try {
@@ -198,10 +201,11 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
     const messagingClient = new MessagingClient(config.awsConfig);
     // Get RunInstanceLogger for recording new runs and inferring dates from previous runs
     const runLogger = new RunInstanceLogger(pathToRunLogs);
-    const effectiveFromDate = getEffectiveFromDate(fromDate, runLogger);
+    const effectiveFromDate = allEntries ? null : getEffectiveFromDate(fromDate, runLogger);
+    const effectiveToDate = allEntries ? null : toDate;
 
     logger.info(`Extracting data for ${patientIds.length} patients`);
-    errors = await extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, toDate);
+    errors = await extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, effectiveToDate);
 
     const { notificationInfo } = config;
     if (notificationInfo) {
