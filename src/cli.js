@@ -10,15 +10,14 @@ program
   .usage('[options]')
   .option('-f --from-date <date>', 'The earliest date and time to search')
   .option('-t --to-date <date>', 'The latest date and time to search')
-  .option('-a, --all-entries', 'Flag to indicate not to filter data by date', true)
-  .option('--no-all-entries', 'Flag to indicate to filter data by date')
+  .option('-e, --entries-filter', 'Flag to indicate to filter data by date')
   .option('-p --path-to-config <path>', 'Specify relative path to config to use:', defaultPathToConfig)
   .option('-l --path-to-run-logs <path>', 'Specify relative path to log file of previous runs:', defaultPathToRunLogs)
   .option('-d, --debug', 'output extra debugging information')
   .parse(process.argv);
 
 const {
-  fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries,
+  fromDate, toDate, pathToConfig, pathToRunLogs, debug, entriesFilter,
 } = program;
 
-app(ICARECSVClient, fromDate, toDate, pathToConfig, pathToRunLogs, debug, null, allEntries);
+app(ICARECSVClient, fromDate, toDate, pathToConfig, pathToRunLogs, debug, null, !entriesFilter);
