@@ -39,7 +39,7 @@ node src/cli.js [options]
 In order to extract data elements, run:
 
 ```bash
-node src/cli.js --from-date <date> --path-to-config <path-to-config-file>
+node src/cli.js --path-to-config <path-to-config-file>
 ```
 
 To see all the options that can be used with the ICARE client, run the following:
@@ -50,15 +50,27 @@ node src/cli.js --help
 
 ## Extraction Date Range
 
-The ICARE Extraction Client extracts provided data that falls within a specified date range. Whenever the ICARE Extraction Client successfully runs, a log is kept of the given date range of the extraction. Users will need to specify the location of the file to save this information. The default location is in a `logs` directory in a file called `run-logs.json`. Initially, this file's contents should be an empty array, `[]`. Users will need to create this file before running the ICARE Extraction Client for the first time.
+The ICARE Extraction Client will extract all data that is provided in the CSV files by default, regardless of any dates associated with each row of data.
+
+It is recommended that any required date filtering is performed outside of the scope of this client. If for any reason a user is required to specify a date range to be extracted through this client, users _must_ add a `dateRecorded` column in every data CSV file. This column will indicate when each row of data was added to the CSV file. Note that this date _does not_ correspond to any date associated with the data element.
+
+### From Date and To Date (NOT recommended use)
+
+If any filtering on data elements in CSV files is required, the `entries-filter` option must be used. The remaining instructions in this section assume this flag is provided.
+
+If a `from-date` is provided as an option when running the ICARE Extraction Client, it will be used to filter out any data elements that are recorded before that date based on the `dateRecorded` column in the CSV files. If a `to-date` is provided as an option, it will be used to filter out any data elements that are recorded after that date based on the `dateRecorded` column in the CSV files. If no `to-date` is provided, the default is today. If no `from-date` is provided, the ICARE Extraction Client will look to a run log file (details below) to find the most recent run and use the `to-date` of that run as the `from-date` for the current run, allowing users to only run the extraction on data elements that were not included in previous runs. If there are no previous run times logged, a `from-date` needs to be provided when running the extraction when the `entries-filter` option is provided. If the `entries-filter` option is not provided, any `from-date` and `to-date` options will be ignored, none of the data elements will be filtered by date, and a successful run will not be logged since there is no specified date range. An example running the client with the `from-date` and `to-date` is as follows:
+
+```bash
+node src/cli.js --entries-filter --from-date <YYYY-MM-DD> --to-date <YYYY-MM-DD> --path-to-config <path-to-config-file>
+```
+
+Whenever the ICARE Extraction Client successfully runs, a log is kept of the given date range of the extraction. Users will need to specify the location of the file to save this information. The default location is in a `logs` directory in a file called `run-logs.json`. Initially, this file's contents should be an empty array, `[]`. Users will need to create this file before running the ICARE Extraction Client with `from-date` and/or `to-date` for the first time.
 
 Users can specify a different location for the file by using the `--path-to-run-logs <path>` CLI option. For example:
 
 ```bash
 node src/cli.js --path-to-run-logs path/to/file.json
 ```
-
-If a `from-date` is provided as an option when running the ICARE Extraction Client, it will be used to filter out any data elements that are recorded before that date. If a `to-date` is provided as an option, it will be used to filter out any data elements that are recorded after that date. If no `to-date` is provided, the default is today. If no `from-date` is provided, the ICARE Extraction Client will look to the run log file to find the most recent run and use the `to-date` of that run as the `from-date` for the current run, allowing users to only run the extraction on data elements that were not included in previous runs. If there are no previous run times logged, a `from-date` needs to be provided when running the extraction, unless the `all-entries` option is provided. If the `all-entries` option is provided, the `from-date` and `to-date` options will be ignored, none of the data elements will be filtered by date, and a successful run will not be logged since there is no specified date range.
 
 ## Configuration
 
@@ -109,5 +121,5 @@ More information on the data that should be provided in each CSV file can be fou
 To use the CSV Extraction with the default configuration file, run the following:
 
 ```bash
-node src/cli.js -p config/icare-csv-config.example.json -f 2020-01-01
+node src/cli.js -p config/icare-csv-config.example.json
 ```
