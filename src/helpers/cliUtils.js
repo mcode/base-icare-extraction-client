@@ -189,7 +189,7 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
 
   try {
     if (debug) logger.level = 'debug';
-    checkLogFile(pathToRunLogs);
+    if (!allEntries) checkLogFile(pathToRunLogs);
     const config = getConfig(pathToConfig);
     checkConfig(config, fromDate, toDate);
     const icareClient = new Client(config);
@@ -200,7 +200,7 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
     // Get messaging client for messaging ICAREPlatform
     const messagingClient = new MessagingClient(config.awsConfig);
     // Get RunInstanceLogger for recording new runs and inferring dates from previous runs
-    const runLogger = new RunInstanceLogger(pathToRunLogs);
+    const runLogger = allEntries ? null : new RunInstanceLogger(pathToRunLogs);
     const effectiveFromDate = allEntries ? null : getEffectiveFromDate(fromDate, runLogger);
     const effectiveToDate = allEntries ? null : toDate;
 
