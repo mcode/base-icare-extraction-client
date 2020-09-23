@@ -1,6 +1,7 @@
 const {
   BaseClient,
   CSVCancerDiseaseStatusExtractor,
+  CSVObservationExtractor,
   CSVConditionExtractor,
   CSVClinicalTrialInformationExtractor,
   CSVPatientExtractor,
@@ -17,6 +18,7 @@ class ICARECSVClient extends BaseClient {
       CSVClinicalTrialInformationExtractor,
       CSVPatientExtractor,
       CSVTreatmentPlanChangeExtractor,
+      CSVObservationExtractor,
     );
 
     this.commonExtractorArgs = {

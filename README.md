@@ -80,13 +80,15 @@ To specify which patients the client should extract data for, the configuration 
 
 To successfully post extracted resources to the ICAREdata infrastructure, you _must_ modify the `awsConfig` object to provide proper AWS credentials. This can be done after your keycloak account has been set up.
 
-Each extractor uses various methods to gather data and format that data into [mCODE](http://hl7.org/fhir/us/mcode/index.html) profiled resources. Extractors may require additional configuration items that can be specified in the configuration file. In order to run the ICARE Extraction Client, you will need extractors for the following resources:
+Each extractor uses various methods to gather data and format that data into [mCODE](http://hl7.org/fhir/us/mcode/index.html) profiled resources. The `observation` extractor formats data into a general [FHIR R4](http://hl7.org/fhir/R4) profile. Extractors may require additional configuration items that can be specified in the configuration file. In order to run the ICARE Extraction Client, you will need extractors for the following resources:
 
 - [patient](http://www.hl7.org/fhir/patient.html)
 - [condition](http://www.hl7.org/fhir/condition.html)
 - clinical trial information, which includes [research study](https://www.hl7.org/fhir/researchstudy.html) and [research subject](https://www.hl7.org/fhir/researchsubject.html)
 - [cancer disease status](http://hl7.org/fhir/us/mcode/StructureDefinition-mcode-cancer-disease-status.html)
 - [care plan with review](http://standardhealthrecord.org/guides/icare/StructureDefinition-icare-care-plan-with-review.html)
+- [observation](http://hl7.org/fhir/R4/observation.html)
+
 
 ## Email Notification
 
@@ -115,6 +117,7 @@ For the CSV extractors to work, each extractor _must_ point to a CSV file in the
 - Clinical trial information CSV example: [`clinical-trial-information.csv`](data/csv/clinical-trial-information.csv)
 - Cancer disease status CSV example: [`cancer-disease-status-information.csv`](data/csv/cancer-disease-status-information.csv)
 - Care plan with review CSV example: [`treatment-plan-change-information.csv`](data/csv/treatment-plan-change-information.csv)
+- Observation CSV example: [`observation-information.csv`](data/csv/observation-information.csv)
 
 More information on the data that should be provided in each CSV file can be found in the [mCODE Extraction Framework documentation](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/CSV_Templates_20200806.xlsx). Note that not all fields are currently supported.
 
