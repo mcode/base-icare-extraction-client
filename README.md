@@ -21,12 +21,15 @@ node src/cli.js --help
 ICARE Extraction Client requires that [Node.js](https://nodejs.org/en/) is installed on the user's system. Node.js >=12 is supported. The ICARE Extraction Client is distributed with all dependent packages installed.
 
 To run the Extraction Client CSV you must have:
+
 1. A CSV file at `data/patient-mrns.csv` that contains a list of all MRN's to be extracted;
 2. CSV files containing the patient data to transform into mCODE data;
 3. A configuration file that points to your data and provides additional information.
 
 ### CSV File Formats: Steps 1 & 2
+
 CSV data for each extractor is expected in the `data` directory. In particular, the following CSV files need to be created and exported.
+
 - `data/patient-mrns.csv` which adheres to the [Patient MRN's CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/patient-mrns.csv)
 - `data/patient-information.csv` which adheres to the [Patient CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/patient.csv)
 - `data/condition-information.csv` which adheres to the [Condition CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/condition.csv)
@@ -40,14 +43,15 @@ Examples files for these extractor can be found in the [`test/sample-client-data
 More information on the data that should be provided in each CSV file can be found in the [mCODE Extraction Framework documentation](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/CSV_Templates_20200806.xlsx). Note that not all fields are currently supported.
 
 ### Configuration Files: Step 3
+
 After exporting your CSV files to the `data` directory, kickstart the creation of a configuration file by renaming the provided `icare-csv-config.example.json` to `csv.config.json`. Then, ensure the following configuration parameters are properly set:
+
 1. `patientIdCsvPath` should provide a file path to a CSV file containing MRN's for relevant patients;
 2. For each extractor, `filePath:` needs to provide a file path to a CSV file containing that corresponding extractor's data;
 3. For the ClinicalInformationExtractor, `clinicalSiteID` needs to correspond to the researchId used by your clinical site in support of the ICAREdata trial.
 4. The `awsConfig` object needs to be entirely updated. Specifically, ensure `jwk` and `clientId` correspond to the KeyCloak authentication information provided by the ICAREdata team, and that `baseURL` and `aud` match the base url and authentication urls for the ICAREdata infrastructure to which you upload patient information.
 
 For instructions on setting up an email notification trigger whenever an error is encountered in extraction, see the [Email Notification](#Email-Notification) section below.`
-
 
 ## Configuration Deep Dive
 
@@ -65,7 +69,6 @@ Each extractor uses various methods to gather data and format that data into [mC
 - [cancer disease status](http://hl7.org/fhir/us/mcode/StructureDefinition-mcode-cancer-disease-status.html)
 - [care plan with review](http://standardhealthrecord.org/guides/icare/StructureDefinition-icare-care-plan-with-review.html)
 - [observation](http://hl7.org/fhir/R4/observation.html)
-
 
 ## Email Notification
 
@@ -109,7 +112,7 @@ If a `from-date` is provided as an option when running the ICARE Extraction Clie
 node src/cli.js --entries-filter --from-date <YYYY-MM-DD> --to-date <YYYY-MM-DD> --path-to-config <path-to-config-file>
 ```
 
-## Prerequisites for Development
+## Developer Guide
 
 After making changes to any of the dependent libraries, including the [mCODE Extraction Framework](https://github.com/mcode/mcode-extraction-framework), you will need to run the following command ensure you have the updated dependencies:
 
