@@ -47,8 +47,8 @@ More information on the data that should be provided in each CSV file can be fou
 After exporting your CSV files to the `data` directory, kickstart the creation of a configuration file by renaming the provided `icare-csv-config.example.json` to `csv.config.json`. Then, ensure the following configuration parameters are properly set:
 
 1. `patientIdCsvPath` should provide a file path to a CSV file containing MRN's for relevant patients;
-2. For each extractor, `filePath:` needs to provide a file path to a CSV file containing that corresponding extractor's data;
-3. For the ClinicalInformationExtractor, `clinicalSiteID` needs to correspond to the researchId used by your clinical site in support of the ICAREdata trial.
+2. For each extractor, `filePath:` should provide a file path to a CSV file containing that corresponding extractor's data;
+3. For the ClinicalInformationExtractor, `clinicalSiteID` should correspond to the researchId used by your clinical site in support of the ICAREdata trial;
 4. The `awsConfig` object needs to be entirely updated. Specifically, ensure `jwk` and `clientId` correspond to the KeyCloak authentication information provided by the ICAREdata team, and that `baseURL` and `aud` match the base url and authentication urls for the ICAREdata infrastructure to which you upload patient information.
 
 For instructions on setting up an email notification trigger whenever an error is encountered in extraction, see the [Email Notification](#Email-Notification) section below.`
