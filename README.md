@@ -20,7 +20,7 @@ node src/cli.js --help
 
 ICARE Extraction Client requires that [Node.js](https://nodejs.org/en/) is installed on the user's system. Node.js >=12 is supported. The ICARE Extraction Client is distributed with all dependent packages installed.
 
-To run the Extraction Client CSV you must have:
+To run the ICARE Extraction Client you must have:
 
 1. A CSV file at `data/patient-mrns.csv` that contains a list of all MRN's to be extracted;
 2. CSV files containing the patient data to transform into mCODE data;
