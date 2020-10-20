@@ -36,7 +36,6 @@ CSV data for each extractor is expected in the `data` directory. In particular, 
 - `data/clinical-trial-information.csv` which adheres to the [Clinical trial CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/clinical-trial-information.csv)
 - `data/cancer-disease-status-information.csv` which adheres to the [Cancer disease status CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/cancer-disease-status.csv)
 - `data/treatment-plan-change-information.csv` which adheres to the [Care plan with review CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/treatment-plan-change.csv)
-- `data/observation-information.csv` which adheres to the [Observation CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/observation.csv)
 
 Examples files for these extractor can be found in the [`test/sample-client-data`](test/sample-client-data) directory. Files there provide examples of the values that are expected in each column, but they are not based on any real patient data.
 
@@ -68,7 +67,6 @@ Each extractor uses various methods to gather data and format that data into [mC
 - clinical trial information, which includes [research study](https://www.hl7.org/fhir/researchstudy.html) and [research subject](https://www.hl7.org/fhir/researchsubject.html)
 - [cancer disease status](http://hl7.org/fhir/us/mcode/StructureDefinition-mcode-cancer-disease-status.html)
 - [care plan with review](http://standardhealthrecord.org/guides/icare/StructureDefinition-icare-care-plan-with-review.html)
-- [observation](http://hl7.org/fhir/R4/observation.html)
 
 ## Email Notification
 
