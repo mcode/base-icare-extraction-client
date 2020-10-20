@@ -19,13 +19,6 @@
       }
     },
     {
-      "label": "observation",
-      "type": "CSVObservationExtractor",
-      "constructorArgs": {
-        "filePath": "./data/observation-information.csv"
-      }
-    },
-    {
       "label": "patient",
       "type": "CSVPatientExtractor",
       "constructorArgs": {
