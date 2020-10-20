@@ -5,6 +5,7 @@ const {
   CSVConditionExtractor,
   CSVClinicalTrialInformationExtractor,
   CSVPatientExtractor,
+  CSVProcedureExtractor,
   CSVTreatmentPlanChangeExtractor,
   CSVCancerRelatedMedicationExtractor,
 } = require('mcode-extraction-framework');
@@ -18,6 +19,7 @@ class ICARECSVClient extends BaseClient {
       CSVConditionExtractor,
       CSVClinicalTrialInformationExtractor,
       CSVPatientExtractor,
+      CSVProcedureExtractor,
       CSVTreatmentPlanChangeExtractor,
       CSVObservationExtractor,
       CSVCancerRelatedMedicationExtractor,
