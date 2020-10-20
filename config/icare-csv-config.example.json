@@ -52,6 +52,7 @@
     "baseURL": "http://example.com",
     "clientId": "client_id",
     "aud": "http://example.com/auth/realms/realm",
-    "jwk": {}
+    "pkcs12": "./path/to/private/key.pem",
+    "pkcs12Pass": "passwordForPemFile"
   }
 }

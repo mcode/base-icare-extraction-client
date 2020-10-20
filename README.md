@@ -48,13 +48,14 @@ After exporting your CSV files to the `data` directory, kickstart the creation o
 1. `patientIdCsvPath` should provide a file path to a CSV file containing MRN's for relevant patients;
 2. For each extractor, `filePath:` should provide a file path to a CSV file containing that corresponding extractor's data;
 3. For the ClinicalInformationExtractor, `clinicalSiteID` should correspond to the researchId used by your clinical site in support of the ICAREdata trial;
-4. The `awsConfig` object needs to be updated - according to the [fhir-messaging-client spec](https://github.com/ICAREdata/fhir-messaging-client) - to include  the following fields:
+4. The `awsConfig` object needs to be updated - according to the [fhir-messaging-client spec](https://github.com/ICAREdata/fhir-messaging-client) - to include the following fields:
    - A `baseURL` field that indicates the base URL of the server to post messages to,
    - A `clientId` field containing the client ID that is registered for the ICAREdata OAuth2 framework.
    - An `aud` field containing the audience parameter that is registered for the client in the ICAREdata OAuth2 framework.
    - And private-key information corresponding to the registered client in the ICAREdata OAuth2 framework, which can be provided in two formats:
-     - A `jwk` field, containing a JWK-JSON object corresponding to, or;
-     - Two fields - `pkcs12` and `pkcs12Pass` - where the former is a filepath to your locally saved PEMfile and the latter is the password for opening that file. Specifically, ensure `jwk` and `clientId` correspond to the KeyCloak authentication information provided by the ICAREdata team, and that `baseURL` and `aud` match the base url and authentication urls for the ICAREdata infrastructure to which you upload patient information.
+     - Two fields - `pkcs12` and `pkcs12Pass` - where the former is a filepath to your locally saved PEMfile and the latter is the password for opening that file, or;
+     - A `jwk` field, containing a JWK-JSON object configured to contain the relevant private-key information.
+
 
 For instructions on setting up an email notification trigger whenever an error is encountered in extraction, see the [Email Notification](#Email-Notification) section below.`
 
