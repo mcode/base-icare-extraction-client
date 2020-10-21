@@ -17,7 +17,7 @@ program
   .parse(process.argv);
 
 const {
-  fromDate, toDate, pathToConfig, pathToRunLogs, debug, entriesFilter,
+  fromDate, toDate, configFilepath, runLogFilepath, debug, entriesFilter,
 } = program;
 
-app(ICARECSVClient, fromDate, toDate, pathToConfig, pathToRunLogs, debug, null, !entriesFilter);
+app(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, null, !entriesFilter);
