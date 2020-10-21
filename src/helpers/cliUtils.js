@@ -81,9 +81,9 @@ function getEffectiveFromDate(fromDate, runLogger) {
   return effectiveFromDate;
 }
 
-async function extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, fromDate, toDate) {
-  if (auth) {
-    await icareClient.initAuth(config.auth);
+async function extractDataForPatients(isUsingWebServices, config, patientIds, icareClient, messagingClient, runLogger, fromDate, toDate) {
+  if (isUsingWebServices) {
+    await icareClient.initAuth(config.webServiceAuthConfig);
   }
 
   await checkMessagingClient(messagingClient);
@@ -184,11 +184,12 @@ async function sendEmailNotification(notificationInfo, errors, debug) {
   });
 }
 
-async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, auth, allEntries) {
+async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries, isUsingWebServices) {
   let errors = {};
 
   try {
     if (debug) logger.level = 'debug';
+    // Don't require a run-logs file if we are extracting all-entries. Only required when using --entries-filter.
     if (!allEntries) checkLogFile(pathToRunLogs);
     const config = getConfig(pathToConfig);
     checkConfig(config, fromDate, toDate);
@@ -205,7 +206,7 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
     const effectiveToDate = allEntries ? null : toDate;
 
     logger.info(`Extracting data for ${patientIds.length} patients`);
-    errors = await extractDataForPatients(auth, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, effectiveToDate);
+    errors = await extractDataForPatients(isUsingWebServices, config, patientIds, icareClient, messagingClient, runLogger, effectiveFromDate, effectiveToDate);
 
     const { notificationInfo } = config;
     if (notificationInfo) {

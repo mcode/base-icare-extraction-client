@@ -20,4 +20,7 @@ const {
   fromDate, toDate, configFilepath, runLogFilepath, debug, entriesFilter,
 } = program;
 
-app(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, null, !entriesFilter);
+// Flag for if webServices are used by the client & auth is required
+const isUsingWebServices = false;
+
+app(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, !entriesFilter, isUsingWebServices);

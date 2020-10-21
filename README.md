@@ -49,7 +49,7 @@ After exporting your CSV files to the `data` directory, kickstart the creation o
 2. For each extractor, `filePath:` should provide a file path to a CSV file containing that corresponding extractor's data;
 3. For the ClinicalInformationExtractor, `clinicalSiteID` should correspond to the researchId used by your clinical site in support of the ICAREdata trial;
 4. The `awsConfig` object needs to be updated - according to the [fhir-messaging-client spec](https://github.com/ICAREdata/fhir-messaging-client) - to include the following fields:
-   - A `baseURL` field that indicates the base URL of the server to post messages to,
+   - A `baseURL` field that indicates the base URL of the server to post messages to.
    - A `clientId` field containing the client ID that is registered for the ICAREdata OAuth2 framework.
    - An `aud` field containing the audience parameter that is registered for the client in the ICAREdata OAuth2 framework.
    - And private-key information corresponding to the registered client in the ICAREdata OAuth2 framework, which can be provided in two formats:
