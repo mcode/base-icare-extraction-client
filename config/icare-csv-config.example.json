@@ -1,46 +1,42 @@
 {
-  "patientIdCsvPath": "./data/csv/patient-mrns.csv",
+  "patientIdCsvPath": "./data/patient-mrns.csv",
   "commonExtractorArgs": {},
   "notificationInfo": {
     "host": "smtp.example.com",
     "port": 587,
     "from": "sender@example.com",
-    "to": ["demo@example.com", "test@example.com"]
+    "to": [
+      "demo@example.com",
+      "test@example.com"
+    ]
   },
   "extractors": [
     {
       "label": "condition",
       "type": "CSVConditionExtractor",
       "constructorArgs": {
-        "filePath": "./data/csv/condition-information.csv"
-      }
-    },
-    {
-      "label": "observation",
-      "type": "CSVObservationExtractor",
-      "constructorArgs": {
-        "filePath": "./data/csv/observation-information.csv"
+        "filePath": "./data/condition-information.csv"
       }
     },
     {
       "label": "patient",
       "type": "CSVPatientExtractor",
       "constructorArgs": {
-        "filePath": "./data/csv/patient-information.csv"
+        "filePath": "./data/patient-information.csv"
       }
     },
     {
       "label": "cancerDiseaseStatus",
       "type": "CSVCancerDiseaseStatusExtractor",
       "constructorArgs": {
-        "filePath": "./data/csv/cancer-disease-status-information.csv"
+        "filePath": "./data/cancer-disease-status-information.csv"
       }
     },
     {
       "label": "clinicalTrialInformation",
       "type": "CSVClinicalTrialInformationExtractor",
       "constructorArgs": {
-        "filePath": "./data/csv/clinical-trial-information.csv",
+        "filePath": "./data/clinical-trial-information.csv",
         "clinicalSiteID": "example-site-id"
       }
     },
@@ -48,7 +44,7 @@
       "label": "treatmentPlanChange",
       "type": "CSVTreatmentPlanChangeExtractor",
       "constructorArgs": {
-          "filePath": "./data/csv/treatment-plan-change-information.csv"
+        "filePath": "./data/treatment-plan-change-information.csv"
       }
     }
   ],
@@ -56,6 +52,7 @@
     "baseURL": "http://example.com",
     "clientId": "client_id",
     "aud": "http://example.com/auth/realms/realm",
-    "jwk": {}
+    "pkcs12": "./path/to/private/key.pem",
+    "pkcs12Pass": "passwordForPemFile"
   }
 }

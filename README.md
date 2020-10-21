@@ -1,45 +1,13 @@
 # ICAREdata Extraction Client
 
-The ICAREdata Extraction Client supports extracting the data elements required for ICAREdata, using CSV files.
-
-## Prerequisites for Use
-
-ICARE Extraction Client requires that [Node.js](https://nodejs.org/en/) is installed on the user's system. Node.js 12 or later is supported. Users will also need to have all dependencies installed. If this tool is packaged with all required dependencies in a `node_modules` folder, nothing new needs to be installed. If not, run:
-
-```bash
-npm install
-```
-
-## Prerequisites for Development
-
-After making changes to any of the dependent libraries, including the [mCODE Extraction Framework](https://github.com/mcode/mcode-extraction-framework), you will need to run the following command ensure you have the updated dependencies:
-
-```bash
-npm install
-```
-
-If you need to update the version of a package (e.g. update `mcode-extraction-framework`), run the following:
-
-```bash
-npm upgrade <pkg-name>
-```
+The ICAREdata Extraction Client supports extracting the ICAREdata data elements from CSV files.
 
 ## General Usage
 
-The ICARE Extraction Client uses the [mCODE Extraction Framework](https://github.com/mcode/mcode-extraction-framework) to extract ICAREdata elements through extractors.
-
-To use the ICARE Extraction Client, you will need to define a configuration file to specify what extractors to use and other basic information. An example configuration file can be found in [`config/config.example.json`](config/config.example.json). For more information, see [Configuration](#Configuration).
-
-Once you have a configuration file, you can use the ICARE Extraction client by running the following:
+Once you have exported CSV data and updated your configuration file, use the ICARE Extraction client by running the following:
 
 ```bash
 node src/cli.js [options]
-```
-
-In order to extract data elements, run:
-
-```bash
-node src/cli.js --path-to-config <path-to-config-file>
 ```
 
 To see all the options that can be used with the ICARE client, run the following:
@@ -48,35 +16,54 @@ To see all the options that can be used with the ICARE client, run the following
 node src/cli.js --help
 ```
 
-## Extraction Date Range
+## First Time User Guide
 
-The ICARE Extraction Client will extract all data that is provided in the CSV files by default, regardless of any dates associated with each row of data.
+ICARE Extraction Client requires that [Node.js](https://nodejs.org/en/) is installed on the user's system. Node.js >=12 is supported. The ICARE Extraction Client is distributed with all dependent packages installed.
 
-It is recommended that any required date filtering is performed outside of the scope of this client. If for any reason a user is required to specify a date range to be extracted through this client, users _must_ add a `dateRecorded` column in every data CSV file. This column will indicate when each row of data was added to the CSV file. Note that this date _does not_ correspond to any date associated with the data element.
+To run the ICARE Extraction Client you must have:
 
-### From Date and To Date (NOT recommended use)
+1. A CSV file at `data/patient-mrns.csv` that contains a list of all MRN's to be extracted;
+2. CSV files containing the patient data to transform into mCODE data;
+3. A configuration file that points to your data and provides additional information.
 
-If any filtering on data elements in CSV files is required, the `entries-filter` option must be used. The remaining instructions in this section assume this flag is provided.
+### CSV File Formats: Steps 1 & 2
 
-If a `from-date` is provided as an option when running the ICARE Extraction Client, it will be used to filter out any data elements that are recorded before that date based on the `dateRecorded` column in the CSV files. If a `to-date` is provided as an option, it will be used to filter out any data elements that are recorded after that date based on the `dateRecorded` column in the CSV files. If no `to-date` is provided, the default is today. If no `from-date` is provided, the ICARE Extraction Client will look to a run log file (details below) to find the most recent run and use the `to-date` of that run as the `from-date` for the current run, allowing users to only run the extraction on data elements that were not included in previous runs. If there are no previous run times logged, a `from-date` needs to be provided when running the extraction when the `entries-filter` option is provided. If the `entries-filter` option is not provided, any `from-date` and `to-date` options will be ignored, none of the data elements will be filtered by date, and a successful run will not be logged since there is no specified date range. An example running the client with the `from-date` and `to-date` is as follows:
+CSV data for each extractor is expected in the `data` directory. In particular, the following CSV files need to be created and exported.
 
-```bash
-node src/cli.js --entries-filter --from-date <YYYY-MM-DD> --to-date <YYYY-MM-DD> --path-to-config <path-to-config-file>
-```
+- `data/patient-mrns.csv` which adheres to the [Patient MRN's CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/patient-mrns.csv)
+- `data/patient-information.csv` which adheres to the [Patient CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/patient.csv)
+- `data/condition-information.csv` which adheres to the [Condition CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/condition.csv)
+- `data/clinical-trial-information.csv` which adheres to the [Clinical trial CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/clinical-trial-information.csv)
+- `data/cancer-disease-status-information.csv` which adheres to the [Cancer disease status CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/cancer-disease-status.csv)
+- `data/treatment-plan-change-information.csv` which adheres to the [Care plan with review CSV Schema](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/treatment-plan-change.csv)
 
-Whenever the ICARE Extraction Client successfully runs, a log is kept of the given date range of the extraction. Users will need to specify the location of the file to save this information. The default location is in a `logs` directory in a file called `run-logs.json`. Initially, this file's contents should be an empty array, `[]`. Users will need to create this file before running the ICARE Extraction Client with `from-date` and/or `to-date` for the first time.
+Examples files for these extractor can be found in the [`test/sample-client-data`](test/sample-client-data) directory. Files there provide examples of the values that are expected in each column, but they are not based on any real patient data.
 
-Users can specify a different location for the file by using the `--path-to-run-logs <path>` CLI option. For example:
+More information on the data that should be provided in each CSV file can be found in the [mCODE Extraction Framework documentation](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/CSV_Templates_20200806.xlsx). Note that not all fields are currently supported.
 
-```bash
-node src/cli.js --path-to-run-logs path/to/file.json
-```
+### Configuration Files: Step 3
 
-## Configuration
+After exporting your CSV files to the `data` directory, kickstart the creation of a configuration file by renaming the provided `icare-csv-config.example.json` to `csv.config.json`. Then, ensure the following configuration parameters are properly set:
+
+1. `patientIdCsvPath` should provide a file path to a CSV file containing MRN's for relevant patients;
+2. For each extractor, `filePath:` should provide a file path to a CSV file containing that corresponding extractor's data;
+3. For the ClinicalInformationExtractor, `clinicalSiteID` should correspond to the researchId used by your clinical site in support of the ICAREdata trial;
+4. The `awsConfig` object needs to be updated - according to the [fhir-messaging-client spec](https://github.com/ICAREdata/fhir-messaging-client) - to include the following fields:
+   - A `baseURL` field that indicates the base URL of the server to post messages to,
+   - A `clientId` field containing the client ID that is registered for the ICAREdata OAuth2 framework.
+   - An `aud` field containing the audience parameter that is registered for the client in the ICAREdata OAuth2 framework.
+   - And private-key information corresponding to the registered client in the ICAREdata OAuth2 framework, which can be provided in two formats:
+     - Two fields - `pkcs12` and `pkcs12Pass` - where the former is a filepath to your locally saved PEMfile and the latter is the password for opening that file, or;
+     - A `jwk` field, containing a JWK-JSON object configured to contain the relevant private-key information.
+
+
+For instructions on setting up an email notification trigger whenever an error is encountered in extraction, see the [Email Notification](#Email-Notification) section below.`
+
+## Configuration Deep Dive
 
 Each deployment of the ICARE Extraction Client needs a configuration file. This file will specify basic information that every run will use. The configuration file can live in the `config` directory or any directory you prefer. An illustrative example file can be found in [`config/icare-csv-config.example.json`](config/icare-csv-config.example.json).
 
-To specify which patients the client should extract data for, the configuration file _must_ point to a CSV file containing MRNs for each patient. An example of this file can be found in [`data/csv/patient-mrns.csv`](data/csv/patient-mrns.csv).
+To specify which patients the client should extract data for, the configuration file _must_ point to a CSV file containing MRNs for each patient. The format for this file can be found [here](https://github.com/mcode/mcode-extraction-framework/blob/master/docs). An example of this file can be found in [`test/sample-client-data/patient-mrns.csv`](test/sample-client-data/patient-mrns.csv).
 
 To successfully post extracted resources to the ICAREdata infrastructure, you _must_ modify the `awsConfig` object to provide proper AWS credentials. This can be done after your keycloak account has been set up.
 
@@ -87,8 +74,6 @@ Each extractor uses various methods to gather data and format that data into [mC
 - clinical trial information, which includes [research study](https://www.hl7.org/fhir/researchstudy.html) and [research subject](https://www.hl7.org/fhir/researchsubject.html)
 - [cancer disease status](http://hl7.org/fhir/us/mcode/StructureDefinition-mcode-cancer-disease-status.html)
 - [care plan with review](http://standardhealthrecord.org/guides/icare/StructureDefinition-icare-care-plan-with-review.html)
-- [observation](http://hl7.org/fhir/R4/observation.html)
-
 
 ## Email Notification
 
@@ -106,23 +91,42 @@ An example of this object can be found in [`config/icare-csv-config.example.json
 
 If the `notificationInfo` object is provided in configuration, an email will be sent using the specified options if any errors occur during data extraction. If any required field is missing in the object (`host` or `to`), an email cannot be sent. If you prefer to not have an email sent even if errors occur, you can choose to not include the `notificationInfo` object in your configuration file.
 
-## CSV Extraction
+## Logging Successful Extractions
 
-In order to extract data elements from CSV files, in addition to the specifications above, your configuration file _must_ use the appropriate CSV Extractors for ICAREdata resources. An example configuration that specifies each extractor and its required configuration can be found in [`config/icare-csv-config.example.json`](config/icare-csv-config.example.json).
+Whenever the ICARE Extraction Client successfully runs, a log is kept of the given date range of the extraction. Users will need to specify the location of the file to save this information. The default location is in a `logs` directory in a file called `run-logs.json`. Initially, this file's contents should be an empty array, `[]`. Users will need to create this file before running the ICARE Extraction Client with `from-date` and/or `to-date` for the first time.
 
-For the CSV extractors to work, each extractor _must_ point to a CSV file in the specified format. Examples of the format required for each extractor can be found in the [`data/csv`](data/csv) directory. These files provide examples of the values that are expected in each column, but they are not based on any real patient data.
-
-- Patient information CSV example: [`patient-information.csv`](data/csv/patient-information.csv)
-- Condition information CSV example: [`condition-information.csv`](data/csv/condition-information.csv)
-- Clinical trial information CSV example: [`clinical-trial-information.csv`](data/csv/clinical-trial-information.csv)
-- Cancer disease status CSV example: [`cancer-disease-status-information.csv`](data/csv/cancer-disease-status-information.csv)
-- Care plan with review CSV example: [`treatment-plan-change-information.csv`](data/csv/treatment-plan-change-information.csv)
-- Observation CSV example: [`observation-information.csv`](data/csv/observation-information.csv)
-
-More information on the data that should be provided in each CSV file can be found in the [mCODE Extraction Framework documentation](https://github.com/mcode/mcode-extraction-framework/blob/master/docs/CSV_Templates_20200806.xlsx). Note that not all fields are currently supported.
-
-To use the CSV Extraction with the default configuration file, run the following:
+Users can specify a different location for the file by using the `--path-to-run-logs <path>` CLI option. For example:
 
 ```bash
-node src/cli.js -p config/icare-csv-config.example.json
+node src/cli.js --path-to-run-logs path/to/file.json
+```
+
+## Extraction Date Range
+
+The ICARE Extraction Client will extract all data that is provided in the CSV files by default, regardless of any dates associated with each row of data. It is recommended that any required date filtering is performed outside of the scope of this client.
+
+If for any reason a user is required to specify a date range to be extracted through this client, users _must_ add a `dateRecorded` column in every data CSV file. This column will indicate when each row of data was added to the CSV file. Note that this date _does not_ correspond to any date associated with the data element.
+
+### CLI From-Date and To-Date (NOT recommended use)
+
+If any filtering on data elements in CSV files is required, the `entries-filter` option must be used. The remaining instructions in this section assume this flag is provided.
+
+If a `from-date` is provided as an option when running the ICARE Extraction Client, it will be used to filter out any data elements that are recorded before that date based on the `dateRecorded` column in the CSV files. If a `to-date` is provided as an option, it will be used to filter out any data elements that are recorded after that date based on the `dateRecorded` column in the CSV files. If no `to-date` is provided, the default is today. If no `from-date` is provided, the ICARE Extraction Client will look to a run log file (details [above](#Logging-Successful-Extractions)) to find the most recent run and use the `to-date` of that run as the `from-date` for the current run, allowing users to only run the extraction on data elements that were not included in previous runs. If there are no previous run times logged, a `from-date` needs to be provided when running the extraction when the `entries-filter` option is provided. If the `entries-filter` option is not provided, any `from-date` and `to-date` options will be ignored, none of the data elements will be filtered by date, and a successful run will not be logged since there is no specified date range. An example running the client with the `from-date` and `to-date` is as follows:
+
+```bash
+node src/cli.js --entries-filter --from-date <YYYY-MM-DD> --to-date <YYYY-MM-DD> --path-to-config <path-to-config-file>
+```
+
+## Developer Guide
+
+After making changes to any of the dependent libraries, including the [mCODE Extraction Framework](https://github.com/mcode/mcode-extraction-framework), you will need to run the following command ensure you have the updated dependencies:
+
+```bash
+npm install
+```
+
+If you need to update the version of a package (e.g. update `mcode-extraction-framework`), run the following:
+
+```bash
+npm upgrade <pkg-name>
 ```
