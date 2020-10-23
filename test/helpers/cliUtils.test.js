@@ -115,12 +115,12 @@ describe('cliUtils', () => {
       get: jest.fn(),
     }))();
 
-    it('should call icareClient.initAuth with testConfig.auth when auth is true', async () => {
+    it('should call icareClient.initAuth with testConfig.webServiceAuthConfig when isUsingWebServices is true', async () => {
       await expect(extractDataForPatients(true, testConfig, testPatientIds, mockIcareClient)).rejects.toThrowError();
       expect(mockIcareClient.initAuth).toHaveBeenCalledWith('example-auth');
     });
 
-    it('should not call icareClient.initAuth when auth is false', async () => {
+    it('should not call icareClient.initAuth when isUsingWebServices is false', async () => {
       mockIcareClient.initAuth.mockClear();
       await expect(extractDataForPatients(false, testConfig, testPatientIds, mockIcareClient)).rejects.toThrowError();
       expect(mockIcareClient.initAuth).not.toHaveBeenCalled();
