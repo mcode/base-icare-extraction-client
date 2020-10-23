@@ -34,7 +34,7 @@ function checkLogFile(pathToLogs) {
     const logFileContent = JSON.parse(fs.readFileSync(pathToLogs));
     if (!Array.isArray(logFileContent)) throw new Error('Log file needs to be an array.');
   } catch (err) {
-    logger.error(`-l/--path-to-run-logs value of ${pathToLogs} did not point to a valid JSON file. Create a json file with an empty array.`);
+    logger.error(`The provided filepath to a LogFile, ${pathToLogs}, did not point to a valid JSON file. Create a json file with an empty array at this location.`);
     throw new Error(err.message);
   }
 }
@@ -62,7 +62,7 @@ function getConfig(pathToConfig) {
   try {
     return JSON.parse(fs.readFileSync(fullPath));
   } catch (err) {
-    throw new Error(`-p/--path-to-config value of ${pathToConfig}, full path ${fullPath} did not point to a valid JSON file.`);
+    throw new Error(`The provided filepath to a configuration file, ${pathToConfig} with full path ${fullPath}, did not point to a valid JSON file.`);
   }
 }
 
