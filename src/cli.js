@@ -1,7 +1,7 @@
 const path = require('path');
 const program = require('commander');
 const { ICARECSVClient } = require('./ICARECSVClient');
-const { app } = require('./helpers/cliUtils');
+const { icareApp } = require('./app');
 
 const defaultPathToConfig = path.join('config', 'csv.config.json');
 const defaultPathToRunLogs = path.join('logs', 'run-logs.json');
@@ -20,7 +20,7 @@ const {
   fromDate, toDate, configFilepath, runLogFilepath, debug, entriesFilter,
 } = program;
 
-// Flag for if webServices are used by the client & auth is required
-const isUsingWebServices = false;
+// Flag to extract allEntries, or just to use to-from dates
+const allEntries = !entriesFilter;
 
-app(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, !entriesFilter, isUsingWebServices);
+icareApp(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, allEntries);
