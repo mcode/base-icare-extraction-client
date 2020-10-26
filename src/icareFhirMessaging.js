@@ -1,3 +1,7 @@
+const _ = require('lodash');
+const { v4 } = require('uuid');
+const moment = require('moment');
+const fhirpath = require('fhirpath');
 const { logger } = require('mcode-extraction-framework');
 const MessagingClient = require('fhir-messaging-client');
 
@@ -24,6 +28,63 @@ async function checkMessagingClient(messagingClient) {
   } catch (e) {
     throw new Error(`Could not authorize messaging client - ${e.message}`);
   }
+}
+
+function makeUUIDFullUrl(uuid) {
+  // Utility for ensuring UUID's follow a valid URL specification as described by FHIR R4“
+  return `urn:uuid:${uuid}`;
+}
+
+function generateNewMessageBundle(bundle) {
+  // Generate a fhir message bundle structured according to the ICARE-submission procedure
+  // link: https://github.com/ICAREdata/icare-data-submission-procedures
+  const siteId = fhirpath.evaluate(
+    bundle,
+    'Bundle.entry.where(resource.resourceType=\'ResearchStudy\').resource.site',
+  )[0];
+  const siteIdValue = _.get(siteId, 'identifier.value', '');
+  const entries = bundle.entry;
+  logger.info(`Generating a new message bundle with ${entries.length} entries`);
+  const dateFormat = 'YYYY-MM-DDThh:mm:ssZ';
+  const messageHeaderId = v4();
+  const messageBodyId = v4();
+  return {
+    resourceType: 'Bundle',
+    id: v4(),
+    type: 'message',
+    timestamp: moment().format(dateFormat),
+    entry: [
+      {
+        fullUrl: makeUUIDFullUrl(messageHeaderId),
+        resource: {
+          resourceType: 'MessageHeader',
+          id: messageHeaderId,
+          eventCoding: {
+            system: 'http://example.org/fhir/message-events',
+            code: 'icaredata-submission',
+          },
+          ...(siteId && { sender: siteId }),
+          source: {
+            endpoint: `http://icaredata.org/${siteIdValue}`,
+          },
+          focus: [
+            {
+              reference: makeUUIDFullUrl(messageBodyId),
+            },
+          ],
+        },
+      },
+      {
+        fullUrl: makeUUIDFullUrl(messageBodyId),
+        resource: {
+          resourceType: 'Bundle',
+          id: messageBodyId,
+          type: 'collection',
+          entry: entries,
+        },
+      },
+    ],
+  };
 }
 
 async function postExtractedData(messagingClient, bundledData) {
@@ -55,4 +116,5 @@ module.exports = {
   checkMessagingClient,
   getMessagingClient,
   postExtractedData,
+  generateNewMessageBundle,
 };

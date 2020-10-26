@@ -5,7 +5,7 @@ const moment = require('moment');
 const { logger } = require('mcode-extraction-framework');
 const { RunInstanceLogger } = require('./RunInstanceLogger');
 const { sendEmailNotification } = require('./emailNotifications');
-const { getMessagingClient, postExtractedData } = require('./fhirMessaging');
+const { getMessagingClient, postExtractedData } = require('./icareFhirMessaging');
 const { extractDataForPatients } = require('./icareExtraction');
 
 function getConfig(pathToConfig) {

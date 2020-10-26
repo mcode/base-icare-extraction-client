@@ -1,7 +1,7 @@
 const path = require('path');
 const program = require('commander');
 const { ICARECSVClient } = require('./ICARECSVClient');
-const { icareApp } = require('./helpers/cliUtils');
+const { icareApp } = require('./cliUtils');
 
 const defaultPathToConfig = path.join('config', 'csv.config.json');
 const defaultPathToRunLogs = path.join('logs', 'run-logs.json');
