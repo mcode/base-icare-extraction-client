@@ -9,7 +9,7 @@ const {
   CSVTreatmentPlanChangeExtractor,
   CSVCancerRelatedMedicationExtractor,
 } = require('mcode-extraction-framework');
-const { generateNewMessageBundle } = require('./helpers/icareBundling');
+const { generateNewMessageBundle } = require('./helpers/icareExtraction');
 
 class ICARECSVClient extends BaseClient {
   constructor({ extractors, commonExtractorArgs }) {

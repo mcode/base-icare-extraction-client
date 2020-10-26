@@ -1,7 +1,8 @@
-const { app } = require('./helpers/cliUtils');
-const { generateNewMessageBundle } = require('./helpers/icareBundling');
+const { icareApp, zipErrors } = require('./helpers/cliUtils');
+const { generateNewMessageBundle } = require('./helpers/icareExtraction');
 
 module.exports = {
-  app,
   generateNewMessageBundle,
+  icareApp,
+  zipErrors,
 };

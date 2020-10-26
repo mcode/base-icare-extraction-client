@@ -3,13 +3,13 @@ const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
 const { logger } = require('mcode-extraction-framework');
-const { RunInstanceLogger } = require('../RunInstanceLogger');
-const { getResourceCountInBundle } = require('./icareBundling');
-const { sendEmailNotification } = require('./emailUtils');
-const { getMessagingClient, postExtractedData } = require('./fhirMessagingUtils');
+const { RunInstanceLogger } = require('./RunInstanceLogger');
+const { sendEmailNotification } = require('./emailNotifications');
+const { getMessagingClient, postExtractedData } = require('./fhirMessaging');
+const { extractDataForPatients } = require('./icareExtraction');
 
-// Checks pathToConfig points to valid JSON file
 function getConfig(pathToConfig) {
+  // Checks pathToConfig points to valid JSON file
   const fullPath = path.resolve(pathToConfig);
   try {
     return JSON.parse(fs.readFileSync(fullPath));
@@ -18,8 +18,8 @@ function getConfig(pathToConfig) {
   }
 }
 
-// Check input args and needed config variables based on client being used
 function checkInputAndConfig(config, fromDate, toDate) {
+  // Check input args and needed config variables based on client being used
   const { patientIdCsvPath } = config;
 
   // Check if `fromDate` is a valid date
@@ -38,8 +38,8 @@ function checkInputAndConfig(config, fromDate, toDate) {
   }
 }
 
-// Check log file exists
 function checkLogFile(pathToLogs) {
+  // Check that the given log file exists
   try {
     const logFileContent = JSON.parse(fs.readFileSync(pathToLogs));
     if (!Array.isArray(logFileContent)) throw new Error('Log file needs to be an array.');
@@ -64,35 +64,6 @@ function getEffectiveFromDate(fromDate, runLogger) {
   return effectiveFromDate;
 }
 
-// Using an initialized mcodeClient, extract data for patient ids in the appropriate toDate-fromDate range
-async function extractDataForPatients(patientIds, mcodeClient, fromDate, toDate) {
-  /* eslint-disable no-restricted-syntax */
-  /* eslint-disable no-await-in-loop */
-  // Track if these runs were successful; if not, don't log a new RunInstance
-  let successfulExtraction = true;
-  const totalExtractionErrors = {};
-  const extractedData = [];
-  for (const [index, mrn] of patientIds.entries()) {
-    totalExtractionErrors[index] = [];
-    try {
-      logger.info(`Extracting information for patient at row ${index + 1} in .csv file`);
-      const { bundle, extractionErrors } = await mcodeClient.get({ mrn, fromDate, toDate });
-      totalExtractionErrors[index].push(...extractionErrors);
-      const resourceCount = getResourceCountInBundle(bundle);
-      logger.info(`Resources extracted for patient ${index + 1} in .csv file`);
-      Object.keys(resourceCount).forEach((resourceType) => logger.info(`${resourceType}: ${resourceCount[resourceType]} extracted`));
-      extractedData.push(bundle);
-    } catch (fatalErr) {
-      successfulExtraction = false;
-      totalExtractionErrors[index].push(fatalErr);
-      logger.error(`Fatal error extracting data: ${fatalErr.message}`);
-      logger.debug(fatalErr.stack);
-    }
-  }
-
-  return { extractedData, successfulExtraction, totalExtractionErrors };
-}
-
 // Given a list of errorObjects where each object may have novel errors for the same patient-row,
 // return a zipped object that combines the list of errors for each patient row into a single row
 function zipErrors(...allErrorSources) {
@@ -111,7 +82,7 @@ function zipErrors(...allErrorSources) {
   return zippedErrors;
 }
 
-async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries) {
+async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries) {
   try {
     if (debug) logger.level = 'debug';
     // Don't require a run-logs file if we are extracting all-entries. Only required when using --entries-filter.
@@ -163,5 +134,6 @@ async function app(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug,
 }
 
 module.exports = {
-  app,
+  zipErrors,
+  icareApp,
 };

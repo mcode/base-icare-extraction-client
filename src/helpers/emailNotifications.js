@@ -1,7 +1,9 @@
 const nodemailer = require('nodemailer');
 const { logger } = require('mcode-extraction-framework');
 
-async function sendEmailNotification(notificationInfo, errors, debug) {
+async function sendEmailNotification(notificationInfo, errors, debug = false) {
+  // Given a notifcationInfo config, an aggregated errors object and an optional debug flag,
+  // Trigger the submission of a nodemailer email according to configuration
   const totalErrors = Object.keys(errors).reduce((previousValue, currentValue) => previousValue + errors[currentValue].length, 0);
   if (totalErrors === 0) {
     return;

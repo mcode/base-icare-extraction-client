@@ -1,7 +1,7 @@
 const path = require('path');
 const program = require('commander');
 const { ICARECSVClient } = require('./ICARECSVClient');
-const { app } = require('./helpers/cliUtils');
+const { icareApp } = require('./helpers/cliUtils');
 
 const defaultPathToConfig = path.join('config', 'csv.config.json');
 const defaultPathToRunLogs = path.join('logs', 'run-logs.json');
@@ -20,4 +20,7 @@ const {
   fromDate, toDate, configFilepath, runLogFilepath, debug, entriesFilter,
 } = program;
 
-app(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, !entriesFilter);
+// Flag to extract allEntries, or just to use to-from dates
+const allEntries = !entriesFilter;
+
+icareApp(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, allEntries);
