@@ -6,7 +6,7 @@ const testBundle = require('./fixtures/message-bundle.json');
 const cliUtils = rewire('../../src/helpers/cliUtils.js');
 /* eslint-disable no-underscore-dangle */
 const checkMessagingClient = cliUtils.__get__('checkMessagingClient');
-const checkConfig = cliUtils.__get__('checkConfig');
+const checkInputAndConfig = cliUtils.__get__('checkInputAndConfig');
 const checkLogFile = cliUtils.__get__('checkLogFile');
 const getConfig = cliUtils.__get__('getConfig');
 const getEffectiveFromDate = cliUtils.__get__('getEffectiveFromDate');
@@ -41,24 +41,24 @@ describe('cliUtils', () => {
     });
   });
 
-  describe('checkConfig', () => {
+  describe('checkInputAndConfig', () => {
     const configWithoutAwsConfig = { patientIdCsvPath: 'example-path' };
     const configWithoutPatientIdCsvPath = { awsConfig: 'example-aws-config' };
 
     it('should throw error when fromDate is invalid.', () => {
-      expect(() => checkConfig(testConfig, '2020-06-31')).toThrowError('-f/--from-date is not a valid date.');
+      expect(() => checkInputAndConfig(testConfig, '2020-06-31')).toThrowError('-f/--from-date is not a valid date.');
     });
     it('should throw error when toDate is invalid date.', () => {
-      expect(() => checkConfig(testConfig, '2020-06-30', '2020-06-31')).toThrowError('-t/--to-date is not a valid date.');
+      expect(() => checkInputAndConfig(testConfig, '2020-06-30', '2020-06-31')).toThrowError('-t/--to-date is not a valid date.');
     });
     it('should throw error when awsConfig not provided in config', () => {
-      expect(() => checkConfig(configWithoutAwsConfig)).toThrowError('patientIdCsvPath, awsConfig are required in config file');
+      expect(() => checkInputAndConfig(configWithoutAwsConfig)).toThrowError('patientIdCsvPath, awsConfig are required in config file');
     });
     it('should throw error when patientIdCsvPath not provided in config', () => {
-      expect(() => checkConfig(configWithoutPatientIdCsvPath)).toThrowError('patientIdCsvPath, awsConfig are required in config file');
+      expect(() => checkInputAndConfig(configWithoutPatientIdCsvPath)).toThrowError('patientIdCsvPath, awsConfig are required in config file');
     });
     it('should not throw error when all args are valid', () => {
-      expect(() => checkConfig(testConfig, '2020-06-01', '2020-06-30')).not.toThrowError();
+      expect(() => checkInputAndConfig(testConfig, '2020-06-01', '2020-06-30')).not.toThrowError();
     });
   });
 
@@ -111,20 +111,8 @@ describe('cliUtils', () => {
     const testFromDate = '2020-01-01';
     const testToDate = '2020-06-30';
     const mockIcareClient = jest.fn().mockImplementation(() => ({
-      initAuth: jest.fn(),
       get: jest.fn(),
     }))();
-
-    it('should call icareClient.initAuth with testConfig.webServiceAuthConfig when isUsingWebServices is true', async () => {
-      await expect(extractDataForPatients(true, testConfig, testPatientIds, mockIcareClient)).rejects.toThrowError();
-      expect(mockIcareClient.initAuth).toHaveBeenCalledWith('example-auth');
-    });
-
-    it('should not call icareClient.initAuth when isUsingWebServices is false', async () => {
-      mockIcareClient.initAuth.mockClear();
-      await expect(extractDataForPatients(false, testConfig, testPatientIds, mockIcareClient)).rejects.toThrowError();
-      expect(mockIcareClient.initAuth).not.toHaveBeenCalled();
-    });
 
     it('should log a successful run when icare client successful returns a message bundle', async () => {
       mockIcareClient.get.mockClear();

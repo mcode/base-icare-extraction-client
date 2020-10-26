@@ -48,6 +48,7 @@ class RunInstanceLogger {
 
   // Calling this adds a new Log record to our local object and to the file on disk
   addRun(fromDate, toDate) {
+    logger.info('Logging successful run information to records');
     // If fromDate isn't valid, or if toDate is both defined and invalid, we can't properly log
     if (!isDate(fromDate) || (toDate && !isDate(toDate))) {
       logger.error(`Trying to add a run to RunInstance logger, but toDate and fromDate are not valid dates: to ${toDate} and from ${fromDate}`);
