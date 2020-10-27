@@ -4,11 +4,11 @@ const testConfig = require('./fixtures/test-config.json');
 const testBundle = require('./fixtures/message-bundle.json');
 const { checkMessagingClient, postExtractedData, getMessagingClient } = require('../src/icareFhirMessaging');
 
-const mockMessagingClient = jest.fn().mockImplementation(() => ({
+const mockMessagingClient = {
   authorize: jest.fn(),
   canSendMessage: jest.fn(),
   processMessage: jest.fn(),
-}))();
+};
 
 // Utility for flattening error values
 function flattenErrorValues(errorValues) {

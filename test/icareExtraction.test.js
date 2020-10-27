@@ -12,9 +12,9 @@ function flattenErrorValues(errorValues) {
 describe('icareExtraction', () => {
   // TODO: Move over to MEF, rename clients to be generic
   describe('extractDataForPatients', () => {
-    const mockIcareClient = jest.fn().mockImplementation(() => ({
+    const mockIcareClient = {
       get: jest.fn(),
-    }))();
+    };
     const testPatientIds = ['123', '456', '789'];
     const testFromDate = '2020-01-01';
     const testToDate = '2020-06-30';
