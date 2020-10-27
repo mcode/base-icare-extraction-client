@@ -1,32 +1,20 @@
 const fs = require('fs');
 const rewire = require('rewire');
-const testConfig = require('./helpers/fixtures/test-config.json');
-const testBundle = require('./helpers/fixtures/message-bundle.json');
+const testConfig = require('./fixtures/test-config.json');
+const testBundle = require('./fixtures/message-bundle.json');
+const { icareApp } = require('../src/cliUtils');
 
-const cliUtils = rewire('../../src/cliUtils.js');
-/* eslint-disable no-underscore-dangle */
-const checkMessagingClient = cliUtils.__get__('checkMessagingClient');
+const cliUtils = rewire('../src/cliUtils.js');
 const checkInputAndConfig = cliUtils.__get__('checkInputAndConfig');
 const checkLogFile = cliUtils.__get__('checkLogFile');
 const getConfig = cliUtils.__get__('getConfig');
 const getEffectiveFromDate = cliUtils.__get__('getEffectiveFromDate');
 const extractDataForPatients = cliUtils.__get__('extractDataForPatients');
-/* eslint-enable no-underscore-dangle */
-const pathToConfig = 'test/fixtures/test-config.json';
-const fsSpy = jest.spyOn(fs, 'readFileSync');
-const mockRunLogger = jest.fn().mockImplementation(() => ({
-  getMostRecentToDate: jest.fn(),
-  addRun: jest.fn(),
-}))();
-
-const mockMessagingClient = jest.fn().mockImplementation(() => ({
-  authorize: jest.fn(),
-  canSendMessage: jest.fn(),
-  processMessage: jest.fn(),
-}))();
 
 describe('cliUtils', () => {
   describe('getConfig', () => {
+    const pathToConfig = 'test/fixtures/test-config.json';
+
     it('should throw error when pathToConfig does not point to valid JSON file.', () => {
       expect(() => getConfig()).toThrowError();
     });
@@ -59,6 +47,7 @@ describe('cliUtils', () => {
   });
 
   describe('checkLogFile', () => {
+    const fsSpy = jest.spyOn(fs, 'readFileSync');
     it('should throw error when not provided a path', () => {
       expect(() => checkLogFile()).toThrowError();
     });
@@ -82,6 +71,10 @@ describe('cliUtils', () => {
 
   describe('getEffectiveFromDate', () => {
     const testDate = '2020-06-16';
+    const mockRunLogger = jest.fn().mockImplementation(() => ({
+      getMostRecentToDate: jest.fn(),
+      addRun: jest.fn(),
+    }))();
 
     beforeEach(() => {
       jest.resetAllMocks();
@@ -102,20 +95,31 @@ describe('cliUtils', () => {
     });
   });
 
-  describe('extractDataForPatients', () => {
-    const testPatientIds = ['123', '456', '789'];
-    const testFromDate = '2020-01-01';
-    const testToDate = '2020-06-30';
+  describe('icareApp', () => {
+    // Mocks
+    const mockRunLogger = jest.fn().mockImplementation(() => ({
+      getMostRecentToDate: jest.fn(),
+      addRun: jest.fn(),
+    }))();
     const mockIcareClient = jest.fn().mockImplementation(() => ({
       get: jest.fn(),
     }))();
+    const mockMessagingClient = jest.fn().mockImplementation(() => ({
+      authorize: jest.fn(),
+      canSendMessage: jest.fn(),
+      processMessage: jest.fn(),
+    }))();
+    const testPatientIds = ['123', '456', '789'];
+    const testFromDate = '2020-01-01';
+    const testToDate = '2020-06-30';
 
     it('should log a successful run when icare client successful returns a message bundle', async () => {
       mockIcareClient.get.mockClear();
       mockRunLogger.addRun.mockClear();
       mockIcareClient.get.mockReturnValue({ bundle: testBundle, extractionErrors: [] });
       mockMessagingClient.canSendMessage.mockReturnValue(true);
-      await expect(extractDataForPatients(true, testConfig, testPatientIds, mockIcareClient, mockMessagingClient, mockRunLogger, testFromDate, testToDate)).resolves.not.toThrowError();
+      await expect(icareApp(mockIcareClient, testPatientIds, mockMessagingClient, mockRunLogger, testFromDate, testToDate)).resolves.not.toThrowError();
+      await expect(icareApp(true, testConfig, testPatientIds, mockIcareClient, mockMessagingClient, mockRunLogger, testFromDate, testToDate)).resolves.not.toThrowError();
       expect(mockIcareClient.get).toHaveBeenCalledTimes(testPatientIds.length);
       expect(mockRunLogger.addRun).toHaveBeenCalled();
     });
@@ -127,31 +131,10 @@ describe('cliUtils', () => {
       mockMessagingClient.processMessage.mockImplementation(() => {
         throw new Error();
       });
-      await expect(extractDataForPatients(true, testConfig, testPatientIds, mockIcareClient, mockMessagingClient, mockRunLogger, testFromDate, testToDate)).resolves.not.toThrowError();
+      await expect(icareApp(true, testConfig, testPatientIds, mockIcareClient, mockMessagingClient, mockRunLogger, testFromDate, testToDate)).resolves.not.toThrowError();
       expect(mockIcareClient.get).toHaveBeenCalledTimes(testPatientIds.length);
       expect(mockRunLogger.addRun).not.toHaveBeenCalled();
       mockMessagingClient.processMessage.mockReset();
-    });
-  });
-
-  describe('checkMessagingClient', () => {
-    it('should throw error when messaging client cannot send message', async () => {
-      mockMessagingClient.canSendMessage.mockReturnValue(false);
-      await expect(checkMessagingClient(mockMessagingClient)).rejects.toThrowError('The server does not provide the "system/$process-message" scope.');
-    });
-
-    it('should not throw error when messaging client can send message', async () => {
-      mockMessagingClient.canSendMessage.mockReturnValue(true);
-      await expect(checkMessagingClient(mockMessagingClient)).resolves.not.toThrowError();
-    });
-
-    it('should throw error when messaging client cannot authorize.', async () => {
-      const errorMsg = 'cannot authorize';
-      mockMessagingClient.authorize.mockImplementation(() => {
-        throw new Error(errorMsg);
-      });
-      await expect(checkMessagingClient(mockMessagingClient)).rejects.toThrowError(`Could not authorize messaging client - ${errorMsg}`);
-      mockMessagingClient.authorize.mockReset();
     });
   });
 });

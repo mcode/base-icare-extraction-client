@@ -82,6 +82,7 @@ function zipErrors(...allErrorSources) {
   return zippedErrors;
 }
 
+// TODO: Create a similar app function in the MEF repo, that only extracts data and... saves it to an output folder
 async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries) {
   try {
     if (debug) logger.level = 'debug';

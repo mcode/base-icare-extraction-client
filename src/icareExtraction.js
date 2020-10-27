@@ -35,7 +35,6 @@ async function extractDataForPatients(patientIds, mcodeClient, fromDate, toDate)
       logger.debug(fatalErr.stack);
     }
   }
-
   return { extractedData, successfulExtraction, totalExtractionErrors };
 }
 
