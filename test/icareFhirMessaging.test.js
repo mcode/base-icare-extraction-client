@@ -1,6 +1,8 @@
 const _ = require('lodash');
+const MessagingClient = require('fhir-messaging-client');
+const testConfig = require('./fixtures/test-config.json');
 const testBundle = require('./fixtures/message-bundle.json');
-const { checkMessagingClient, postExtractedData } = require('../src/icareFhirMessaging');
+const { checkMessagingClient, postExtractedData, getMessagingClient } = require('../src/icareFhirMessaging');
 
 const mockMessagingClient = jest.fn().mockImplementation(() => ({
   authorize: jest.fn(),
@@ -14,6 +16,17 @@ function flattenErrorValues(errorValues) {
 }
 
 describe('icareFhirMessaging', () => {
+  describe('getMessagingClient', () => {
+    it('should throw error when awsConfig not provided in config', () => {
+      expect(() => getMessagingClient({})).toThrowError('config file is missing `awsConfig` field, which is required to create a messagingClient instance');
+    });
+    it('should return a messaging Client when the config is valid', () => {
+      const mClient = getMessagingClient(testConfig);
+      expect(() => getMessagingClient(testConfig)).not.toThrowError();
+      expect(mClient).toBeInstanceOf(MessagingClient);
+    });
+  });
+
   describe('checkMessagingClient', () => {
     it('should throw error when messaging client cannot send message', async () => {
       mockMessagingClient.canSendMessage.mockReturnValue(false);
