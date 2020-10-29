@@ -1,11 +1,21 @@
+const fhirpath = require('fhirpath');
 const { logger } = require('mcode-extraction-framework');
 
 function getResourceCountInBundle(messageBundle) {
-  // From a icareData FHIR Message bundle,
-  // Determine the number of resources in the main collection bundle
-  return messageBundle.entry[1].resource.entry.reduce((accumulator, resource) => {
-    const { resourceType } = resource.resource;
-    accumulator[resourceType] = accumulator[resourceType] ? accumulator[resourceType] + 1 : 1;
+  const allResourceTypesPath = 'Bundle.descendants().resource.resourceType';
+  // NOTE: Dynamically generated from input; could be abused later?
+  const allResourceTypes = fhirpath.evaluate(
+    messageBundle,
+    allResourceTypesPath,
+  );
+
+  const countThisResource = (resourceType) => `Bundle.descendants().where(resource.resourceType = '${resourceType}').count()`;
+  return allResourceTypes.reduce((accumulator, resourceType) => {
+    const countForThisResource = fhirpath.evaluate(
+      messageBundle,
+      countThisResource(resourceType),
+    );
+    accumulator[resourceType] = countForThisResource;
     return accumulator;
   }, {});
 }

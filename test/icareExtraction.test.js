@@ -55,9 +55,4 @@ describe('icareExtraction', () => {
       expect(mockIcareClient.get).toHaveBeenCalledTimes(testPatientIds.length);
     });
   });
-
-  describe('getResourceCountInBundle', () => {
-    // TODO: MAKE TESTS HERE
-    // getResourceCountInBundle;
-  });
 });
