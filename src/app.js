@@ -3,10 +3,10 @@ const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
 const { logger } = require('mcode-extraction-framework');
-const { RunInstanceLogger } = require('./RunInstanceLogger');
-const { sendEmailNotification } = require('./emailNotifications');
+const { sendEmailNotification, zipErrors } = require('mcode-extraction-framework');
+const { extractDataForPatients } = require('mcode-extraction-framework');
+const { RunInstanceLogger } = require('mcode-extraction-framework');
 const { getMessagingClient, postExtractedData } = require('./icareFhirMessaging');
-const { extractDataForPatients } = require('./mcodeClientExtraction');
 
 function getConfig(pathToConfig) {
   // Checks pathToConfig points to valid JSON file
@@ -64,25 +64,9 @@ function getEffectiveFromDate(fromDate, runLogger) {
   return effectiveFromDate;
 }
 
-// Given a list of errorObjects where each object may have novel errors for the same patient-row,
-// return a zipped object that combines the list of errors for each patient row into a single row
-function zipErrors(...allErrorSources) {
-  // NOTE: assumes each error object is a k-v pair: k is the MRN-id CSV row of the patient, v is an [errors] for that patient at some pipeline step
-  const zippedErrors = {};
-
-  allErrorSources.forEach((errorObject) => {
-    const keys = Object.keys(errorObject);
-    keys.forEach((key) => {
-      if (zippedErrors[key] === undefined) {
-        zippedErrors[key] = [];
-      }
-      zippedErrors[key] = zippedErrors[key].concat(errorObject[key]);
-    });
-  });
-  return zippedErrors;
-}
-
-// TODO: Create a similar app function in the MEF repo, that only extracts data and... saves it to an output folder
+// TODO: There is a lot of overlap with this application and the mcode application,
+// esp. when it comes to the configuration file helpers, log-file helpers and effective-date parsers;
+// can improve later
 async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries) {
   try {
     if (debug) logger.level = 'debug';
@@ -135,6 +119,5 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
 }
 
 module.exports = {
-  zipErrors,
   icareApp,
 };
