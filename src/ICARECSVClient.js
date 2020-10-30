@@ -24,12 +24,12 @@ class ICARECSVClient extends BaseClient {
       CSVObservationExtractor,
       CSVCancerRelatedMedicationExtractor,
     );
-
+    // Store the extractors defined by the configuration file as local state
+    this.extractorConfig = extractors;
     this.commonExtractorArgs = {
       implementation: 'icare',
       ...commonExtractorArgs,
     };
-    this.initializeExtractors(extractors, this.commonExtractorArgs);
   }
 
   async get(args) {

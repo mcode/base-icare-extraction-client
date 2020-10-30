@@ -74,7 +74,10 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
     if (!allEntries) checkLogFile(pathToRunLogs);
     const config = getConfig(pathToConfig);
     checkInputAndConfig(config, fromDate, toDate);
+
+    // Create and initialize client
     const icareClient = new Client(config);
+    await icareClient.init();
 
     // Parse CSV for list of patient mrns
     const patientIdsCsvPath = path.resolve(config.patientIdCsvPath);
