@@ -23,16 +23,21 @@ const testConfig = {
 };
 
 const icareClient = new ICARECSVClient(testConfig);
-// Spy on extractor get functions and mock return values
-const condExtractorGetSpy = jest.spyOn(
-  icareClient.extractors.find((ext) => ext.constructor.name === 'CSVConditionExtractor'),
-  'get',
-);
-condExtractorGetSpy
-  .mockReturnValue(exampleCondition);
 
 describe('ICAREClient', () => {
+  beforeAll(async () => {
+    await icareClient.init();
+  });
+
   test('get returns a valid message bundle', async () => {
+    // Spy on extractor get functions and mock return values
+    const condExtractorGetSpy = jest.spyOn(
+      icareClient.extractors.find((ext) => ext.constructor.name === 'CSVConditionExtractor'),
+      'get',
+    );
+    condExtractorGetSpy
+      .mockReturnValue(exampleCondition);
+
     const { bundle } = await icareClient.get({
       mrn: MOCK_PATIENT_MRN,
       fromDate: MOCK_FROM_DATE,
@@ -56,6 +61,14 @@ describe('ICAREClient', () => {
   });
 
   test('get returns a bundle containing all our example entries', async () => {
+    // Spy on extractor get functions and mock return values
+    const condExtractorGetSpy = jest.spyOn(
+      icareClient.extractors.find((ext) => ext.constructor.name === 'CSVConditionExtractor'),
+      'get',
+    );
+    condExtractorGetSpy
+      .mockReturnValue(exampleCondition);
+
     const { bundle } = await icareClient.get({
       mrn: MOCK_PATIENT_MRN,
       fromDate: MOCK_FROM_DATE,
