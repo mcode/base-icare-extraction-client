@@ -1,58 +1,12 @@
 const fs = require('fs');
 const rewire = require('rewire');
 const testConfig = require('./fixtures/test-config.json');
-// TODO: Uncomment once the handoff below is done
-// const { icareApp } = require('../src/app');
 
 const appUtils = rewire('../src/app.js');
 const checkInputAndConfig = appUtils.__get__('checkInputAndConfig');
 const checkLogFile = appUtils.__get__('checkLogFile');
 const getConfig = appUtils.__get__('getConfig');
 const getEffectiveFromDate = appUtils.__get__('getEffectiveFromDate');
-
-// TODO: Hand off to someone else to write these tests. I"m tired and can't handle this rn.
-// describe('icareApp', () => {
-//   // Mocks
-//   const mockRunLogger = {
-//     getMostRecentToDate: jest.fn(),
-//     addRun: jest.fn(),
-//   };
-//   const mockIcareClient = {
-//     get: jest.fn(),
-//   };
-//   const mockMessagingClient = {
-//     authorize: jest.fn(),
-//     canSendMessage: jest.fn(),
-//     processMessage: jest.fn(),
-//   };
-//   const testPatientIds = ['123', '456', '789'];
-//   const testFromDate = '2020-01-01';
-//   const testToDate = '2020-06-30';
-
-//   it('when data is extracted and sent without errors, it should log a message', async () => {
-//     mockIcareClient.get.mockClear();
-//     mockRunLogger.addRun.mockClear();
-//     mockIcareClient.get.mockReturnValue({ bundle: testBundle, extractionErrors: [] });
-//     mockMessagingClient.canSendMessage.mockReturnValue(true);
-//     await expect(icareApp(mockIcareClient, testPatientIds, mockMessagingClient, mockRunLogger, testFromDate, testToDate)).resolves.not.toThrowError();
-//     await expect(icareApp(true, testConfig, testPatientIds, mockIcareClient, mockMessagingClient, mockRunLogger, testFromDate, testToDate)).resolves.not.toThrowError();
-//     expect(mockIcareClient.get).toHaveBeenCalledTimes(testPatientIds.length);
-//     expect(mockRunLogger.addRun).toHaveBeenCalled();
-//   });
-
-//   it('should not log a successful run when messaging client cannot process message', async () => {
-//     mockIcareClient.get.mockClear();
-//     mockRunLogger.addRun.mockClear();
-//     mockIcareClient.get.mockReturnValue(testBundle);
-//     mockMessagingClient.processMessage.mockImplementation(() => {
-//       throw new Error();
-//     });
-//     await expect(icareApp(true, testConfig, testPatientIds, mockIcareClient, mockMessagingClient, mockRunLogger, testFromDate, testToDate)).resolves.not.toThrowError();
-//     expect(mockIcareClient.get).toHaveBeenCalledTimes(testPatientIds.length);
-//     expect(mockRunLogger.addRun).not.toHaveBeenCalled();
-//     mockMessagingClient.processMessage.mockReset();
-//   });
-// });
 
 describe('appUtils', () => {
   describe('getConfig', () => {
