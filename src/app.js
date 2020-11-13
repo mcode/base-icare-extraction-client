@@ -20,7 +20,7 @@ function getConfig(pathToConfig) {
 
 function checkInputAndConfig(config, fromDate, toDate) {
   // Check input args and needed config variables based on client being used
-  const { patientIdCsvPath } = config;
+  const { patientIdCsvPath, awsConfig } = config;
 
   // Check if `fromDate` is a valid date
   if (fromDate && !moment(fromDate).isValid()) {
@@ -32,9 +32,9 @@ function checkInputAndConfig(config, fromDate, toDate) {
     throw new Error('-t/--to-date is not a valid date.');
   }
 
-  // Check if there is a path to the MRN CSV within our config JSON
-  if (!patientIdCsvPath) {
-    throw new Error('patientIdCsvPath is required in config file');
+  // Check if there is a path to the MRN CSV and a path to the AWS config within our config file
+  if (!awsConfig || !patientIdCsvPath) {
+    throw new Error('patientIdCsvPath, awsConfig are required in config file');
   }
 }
 
