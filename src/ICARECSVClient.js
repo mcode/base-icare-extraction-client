@@ -9,7 +9,7 @@ const {
   CSVTreatmentPlanChangeExtractor,
   CSVCancerRelatedMedicationExtractor,
 } = require('mcode-extraction-framework');
-const { generateNewMessageBundle } = require('./helpers/icareBundling');
+const { generateNewMessageBundle } = require('./icareFhirMessaging');
 
 class ICARECSVClient extends BaseClient {
   constructor({ extractors, commonExtractorArgs }) {
@@ -24,12 +24,12 @@ class ICARECSVClient extends BaseClient {
       CSVObservationExtractor,
       CSVCancerRelatedMedicationExtractor,
     );
-
+    // Store the extractors defined by the configuration file as local state
+    this.extractorConfig = extractors;
     this.commonExtractorArgs = {
       implementation: 'icare',
       ...commonExtractorArgs,
     };
-    this.initializeExtractors(extractors, this.commonExtractorArgs);
   }
 
   async get(args) {
