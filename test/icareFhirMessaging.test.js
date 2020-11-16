@@ -51,7 +51,7 @@ describe('icareFhirMessaging', () => {
   describe('postExtractedData', () => {
     it('should post data successfully when supplied appropriate message bundles', async () => {
       mockMessagingClient.canSendMessage.mockReturnValue(true);
-      // postExtractedData expects an araray of bundles, one for each patient
+      // postExtractedData expects an array of bundles, one for each patient
       const arrayOfBundles = [testBundle.testBundle, testBundle];
       const { successfulMessagePost, messagingErrors } = await postExtractedData(mockMessagingClient, arrayOfBundles);
       expect(successfulMessagePost).toEqual(true);
@@ -61,6 +61,7 @@ describe('icareFhirMessaging', () => {
     });
 
     it('should fail to post data when messaging client cannot process message', async () => {
+      mockMessagingClient.canSendMessage.mockReturnValue(true);
       mockMessagingClient.processMessage.mockImplementation(() => {
         throw new Error();
       });
