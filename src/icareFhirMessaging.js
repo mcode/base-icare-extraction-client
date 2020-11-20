@@ -100,12 +100,20 @@ async function postExtractedData(messagingClient, bundledData) {
       await messagingClient.processMessage(bundle);
       logger.info(`SUCCESS - sent message for patient at row ${i + 1}`);
     } catch (e) {
-      successfulMessagePost = false;
-      messagingErrors[i].push(e);
-      const violation = JSON.parse(e.response.data.errorMessage);
-      const violationText = violation.entry[1].resource.issue.details.text;
-      logger.error(`ERROR - could not send message for patient at row ${i + 1} - ${e.message} - ${violationText}`);
-      logger.debug(e.stack);
+      try {
+        // Try to rely on the ICAREdata-submission defined error format to parse an informative message
+        successfulMessagePost = false;
+        messagingErrors[i].push(e);
+        const violation = JSON.parse(e.response.data.errorMessage);
+        const violationText = violation.entry[1].resource.issue.details.text;
+        logger.error(`ERROR - could not send message for patient at row ${i + 1} - ${e.message} - ${violationText}`);
+        logger.debug(e.stack);
+      } catch (e2) {
+        // We're provided an error that was produced before or after the process message function;
+        // Handle this as a special case
+        logger.error(`ERROR - ${e2.message}`);
+        logger.debug(e2.stack);
+      }
     }
   });
 
