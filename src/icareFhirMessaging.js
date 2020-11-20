@@ -111,8 +111,11 @@ async function postExtractedData(messagingClient, bundledData) {
       } catch (e2) {
         // We're provided an error that was produced before or after the process message function;
         // Handle this as a special case
-        logger.error(`ERROR - ${e2.message}`);
+        logger.error(`ERROR - could not parse processMessage response as expected, failed and produced "${e2.message}"
+        processMessage error has status ${e.status} and message "${e.message}"
+        `);
         logger.debug(e2.stack);
+        logger.debug(e.stack);
       }
     }
   });
