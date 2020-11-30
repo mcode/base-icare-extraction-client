@@ -1,13 +1,10 @@
 const {
   BaseClient,
   CSVCancerDiseaseStatusExtractor,
-  CSVObservationExtractor,
   CSVConditionExtractor,
   CSVClinicalTrialInformationExtractor,
   CSVPatientExtractor,
-  CSVProcedureExtractor,
   CSVTreatmentPlanChangeExtractor,
-  CSVCancerRelatedMedicationExtractor,
 } = require('mcode-extraction-framework');
 const { generateNewMessageBundle } = require('./icareFhirMessaging');
 
@@ -19,10 +16,7 @@ class ICARECSVClient extends BaseClient {
       CSVConditionExtractor,
       CSVClinicalTrialInformationExtractor,
       CSVPatientExtractor,
-      CSVProcedureExtractor,
       CSVTreatmentPlanChangeExtractor,
-      CSVObservationExtractor,
-      CSVCancerRelatedMedicationExtractor,
     );
     // Store the extractors defined by the configuration file as local state
     this.extractorConfig = extractors;
