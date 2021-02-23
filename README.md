@@ -53,7 +53,7 @@ After exporting your CSV files to the `data` directory, kickstart the creation o
    - A `clientId` field containing the client ID that is registered for the ICAREdata OAuth2 framework.
    - An `aud` field containing the audience parameter that is registered for the client in the ICAREdata OAuth2 framework.
    - And private-key information corresponding to the registered client in the ICAREdata OAuth2 framework, which can be provided in two formats:
-     - Two fields - `pkcs12` and `pkcs12Pass` - where the former is a filepath to your locally saved PEMfile and the latter is the password for opening that file, or;
+     - Two fields - `pkcs12` and `pkcs12Pass` - where the former is a filepath to your locally saved P12 file and the latter is the password for opening that file, or;
      - A `jwk` field, containing a JWK-JSON object configured to contain the relevant private-key information.
 
 
