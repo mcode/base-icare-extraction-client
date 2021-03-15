@@ -101,12 +101,6 @@ Users can specify a different location for the file by using the `--run-log-file
 node src/cli.js --run-log-filepath path/to/file.json
 ```
 
-## Extraction Date Range
-
-The ICARE Extraction Client will extract all data that is provided in the CSV files by default, regardless of any dates associated with each row of data. It is recommended that any required date filtering is performed outside of the scope of this client.
-
-If for any reason a user is required to specify a date range to be extracted through this client, users _must_ add a `dateRecorded` column in every data CSV file. This column will indicate when each row of data was added to the CSV file. Note that this date _does not_ correspond to any date associated with the data element.
-
 ## Test Flight
 
 In order to test the extraction of ICARE data without posting to an ICAREdata AWS environment, use the `--test-flight` CLI option. For example:
@@ -116,6 +110,12 @@ node src/cli.js --test-flight
 ```
 
 When this flag is used, the ICARE Extraction Client will execute full extraction using any extractors specified in the configuration file. However, no data will be sent to the AWS environment specified in the configuration file and no data will be output to a file. This flag is intended to be used for debugging and ensuring extraction is successful before posting any data.
+
+## Extraction Date Range
+
+The ICARE Extraction Client will extract all data that is provided in the CSV files by default, regardless of any dates associated with each row of data. It is recommended that any required date filtering is performed outside of the scope of this client.
+
+If for any reason a user is required to specify a date range to be extracted through this client, users _must_ add a `dateRecorded` column in every data CSV file. This column will indicate when each row of data was added to the CSV file. Note that this date _does not_ correspond to any date associated with the data element.
 
 ### CLI From-Date and To-Date (NOT recommended use)
 

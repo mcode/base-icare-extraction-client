@@ -13,8 +13,8 @@ program
   .option('-e, --entries-filter', 'Flag to indicate to filter data by date')
   .option('-c --config-filepath <path>', 'Specify relative path to config to use:', defaultPathToConfig)
   .option('-r --run-log-filepath <path>', 'Specify relative path to log file of previous runs:', defaultPathToRunLogs)
-  .option('-d, --debug', 'output extra debugging information')
-  .option('--test-flight', 'only extract data but do not post it')
+  .option('-d, --debug', 'Output extra debugging information')
+  .option('--test-flight', 'Flag to test extraction without posting to AWS')
   .parse(process.argv);
 
 const {
