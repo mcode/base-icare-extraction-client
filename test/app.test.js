@@ -39,7 +39,7 @@ describe('appUtils', () => {
       delete awsMissingConfig.awsConfig;
       expect(() => checkInputAndConfig(awsMissingConfig, '2020-06-01', '2020-06-30', false)).toThrowError('awsConfig is required in config file');
     });
-    it('should not throw an error if awsConfig is missing when not in a test flight', () => {
+    it('should not throw an error if awsConfig is missing when in a test flight', () => {
       const awsMissingConfig = { ...testConfig };
       delete awsMissingConfig.awsConfig;
       expect(() => checkInputAndConfig(awsMissingConfig, '2020-06-01', '2020-06-30', true)).not.toThrowError();
