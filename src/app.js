@@ -18,7 +18,7 @@ function getConfig(pathToConfig) {
   }
 }
 
-function checkInputAndConfig(config, fromDate, toDate) {
+function checkInputAndConfig(config, fromDate, toDate, testFlight) {
   // Check input args and needed config variables based on client being used
   const { patientIdCsvPath, awsConfig } = config;
 
@@ -33,8 +33,13 @@ function checkInputAndConfig(config, fromDate, toDate) {
   }
 
   // Check if there is a path to the MRN CSV and a path to the AWS config within our config file
-  if (!awsConfig || !patientIdCsvPath) {
-    throw new Error('patientIdCsvPath, awsConfig are required in config file');
+  if (!patientIdCsvPath) {
+    throw new Error('patientIdCsvPath is required in config file');
+  }
+
+  // AWS config is not required during test flight runs
+  if (!testFlight && !awsConfig) {
+    throw new Error('awsConfig is required in config file');
   }
 }
 
@@ -74,7 +79,7 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
     // Don't require a run-logs file if we are extracting all-entries. Only required when using --entries-filter.
     if (!allEntries) checkLogFile(pathToRunLogs);
     const config = getConfig(pathToConfig);
-    checkInputAndConfig(config, fromDate, toDate);
+    checkInputAndConfig(config, fromDate, toDate, testFlight);
 
     // Create and initialize client
     const icareClient = new Client(config);
