@@ -18,7 +18,7 @@ function getConfig(pathToConfig) {
   }
 }
 
-function checkInputAndConfig(config, fromDate, toDate) {
+function checkInputAndConfig(config, fromDate, toDate, testFlight) {
   // Check input args and needed config variables based on client being used
   const { patientIdCsvPath, awsConfig } = config;
 
@@ -33,8 +33,13 @@ function checkInputAndConfig(config, fromDate, toDate) {
   }
 
   // Check if there is a path to the MRN CSV and a path to the AWS config within our config file
-  if (!awsConfig || !patientIdCsvPath) {
-    throw new Error('patientIdCsvPath, awsConfig are required in config file');
+  if (!patientIdCsvPath) {
+    throw new Error('patientIdCsvPath is required in config file');
+  }
+
+  // AWS config is not required during test flight runs
+  if (!testFlight && !awsConfig) {
+    throw new Error('awsConfig is required in config file');
   }
 }
 
@@ -67,13 +72,14 @@ function getEffectiveFromDate(fromDate, runLogger) {
 // TODO: There is a lot of overlap with this application and the mcode application,
 // esp. when it comes to the configuration file helpers, log-file helpers and effective-date parsers;
 // can improve later
-async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries) {
+async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries, testFlight) {
   try {
     if (debug) logger.level = 'debug';
+    if (testFlight) logger.info('test-flight will perform extraction but will not post any data');
     // Don't require a run-logs file if we are extracting all-entries. Only required when using --entries-filter.
     if (!allEntries) checkLogFile(pathToRunLogs);
     const config = getConfig(pathToConfig);
-    checkInputAndConfig(config, fromDate, toDate);
+    checkInputAndConfig(config, fromDate, toDate, testFlight);
 
     // Create and initialize client
     const icareClient = new Client(config);
@@ -84,7 +90,8 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
     const patientIds = parse(fs.readFileSync(patientIdsCsvPath, 'utf8'), { columns: true }).map((row) => row.mrn);
 
     // Get messaging client for messaging ICAREPlatform
-    const messagingClient = getMessagingClient(config);
+    let messagingClient = null;
+    if (!testFlight) messagingClient = getMessagingClient(config);
 
     // Get RunInstanceLogger for recording new runs and inferring dates from previous runs
     const runLogger = allEntries ? null : new RunInstanceLogger(pathToRunLogs);
@@ -96,18 +103,25 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
     const { extractedData, successfulExtraction, totalExtractionErrors } = await extractDataForPatients(patientIds, icareClient, effectiveFromDate, effectiveToDate);
 
     // Post the data using the messagingClient
-    logger.info(`Posting data for ${patientIds.length} patients`);
-    const { successfulMessagePost, messagingErrors } = await postExtractedData(messagingClient, extractedData);
+    let successfulMessagePost = true;
+    let messagingErrors = {};
+    if (!testFlight) {
+      logger.info(`Posting data for ${patientIds.length} patients`);
+      ({ successfulMessagePost, messagingErrors } = await postExtractedData(messagingClient, extractedData));
+    }
 
+    // Don't send emails if we're in a test-flight run
     // If we have notification information, send an emailNotification
     const { notificationInfo } = config;
-    if (notificationInfo) {
+    if (!testFlight && notificationInfo) {
       const notificationErrors = zipErrors(totalExtractionErrors, messagingErrors);
       await sendEmailNotification(notificationInfo, notificationErrors, debug);
     }
+
+    // Only log successful runs if we're in a real run, not a test-flight run
     // A run is successful and should be logged when both extraction finishes without fatal errors
     // and messages are posted without fatal errors
-    if (!allEntries && effectiveFromDate) {
+    if (!testFlight && !allEntries && effectiveFromDate) {
       const successCondition = successfulExtraction && successfulMessagePost;
       if (successCondition) {
         runLogger.addRun(effectiveFromDate, effectiveToDate);

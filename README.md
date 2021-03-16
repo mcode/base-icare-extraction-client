@@ -48,7 +48,7 @@ After exporting your CSV files to the `data` directory, kickstart the creation o
 1. `patientIdCsvPath` should provide a file path to a CSV file containing MRN's for relevant patients;
 2. For each extractor, `filePath:` should provide a file path to a CSV file containing that corresponding extractor's data;
 3. For the ClinicalInformationExtractor, `clinicalSiteID` should correspond to the researchId used by your clinical site in support of the ICAREdata trial;
-3. The `awsConfig` object needs to be updated to include the following fields with information that is sent separately by the ICAREdata team:
+4. The `awsConfig` object needs to be updated to include the following fields with information that is sent separately by the ICAREdata team:
    - A `baseURL` field that indicates the base URL of the server to post messages to.
    - A `clientId` field containing the client ID that is registered for the ICAREdata OAuth2 framework.
    - An `aud` field containing the audience parameter that is registered for the client in the ICAREdata OAuth2 framework.
@@ -100,6 +100,16 @@ Users can specify a different location for the file by using the `--run-log-file
 ```bash
 node src/cli.js --run-log-filepath path/to/file.json
 ```
+
+## Test Flight
+
+In order to test the extraction of ICARE data without posting to an ICAREdata AWS environment, use the `--test-flight` CLI option. For example:
+
+```bash
+node src/cli.js --test-flight
+```
+
+When this flag is used, the ICARE Extraction Client will execute full extraction using any extractors specified in the configuration file. However, no data will be sent to the AWS environment specified in the configuration file and no data will be output to a file. This flag is intended to be used for debugging and ensuring extraction is successful before posting any data.
 
 ## Extraction Date Range
 
