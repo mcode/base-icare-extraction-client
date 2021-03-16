@@ -2,8 +2,7 @@ node_modules/
 .vscode/
 .DS_Store
 output/
-config.json
-*.config.json
-output/
 logs/
 *.p12
+config/*.json
+!config/csv.config.example.json
