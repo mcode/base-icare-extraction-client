@@ -2,7 +2,6 @@ node_modules/
 .vscode/
 .DS_Store
 output/
-config.json
 *.config.json
 output/
 logs/
