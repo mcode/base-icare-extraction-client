@@ -2,6 +2,10 @@
 
 The ICAREdata Extraction Client supports extracting the ICAREdata data elements from CSV files.
 
+## Prerequisites
+
+- [Node.js >= 12](https://nodejs.org/en/)
+
 ## General Usage
 
 Once you have exported CSV data and updated your configuration file, use the ICARE Extraction client by running the following:
