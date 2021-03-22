@@ -15,8 +15,8 @@ const testConfig = {
       label: 'condition',
       type: 'CSVConditionExtractor',
       constructorArgs: {
-        // These CSV paths don't point at actual data, but valid files are needed to avoid parser errors
-        filePath: path.join(__dirname, './fixtures/csv/example.csv'),
+        // This CSV path doesn't point at actual data, but a valid file with valid columns is needed to avoid CSV parser and CSV validation errors
+        filePath: path.join(__dirname, './fixtures/csv/example-condition.csv'),
       },
     },
   ],
