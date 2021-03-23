@@ -108,10 +108,10 @@ node src/cli.js --entries-filter --from-date YYYY-MM-DD --to-date YYY-MM-DD --ru
 
 ## Test Flight
 
-In order to test the extraction of ICARE data without posting to an ICAREdata AWS environment, use the `--test-flight` CLI option. For example:
+In order to test the extraction of ICARE data without posting to an ICAREdata AWS environment, use the `--test-extraction` CLI option. For example:
 
 ```bash
-node src/cli.js --test-flight
+node src/cli.js --test-extraction
 ```
 
 When this flag is used, the ICARE Extraction Client will execute full extraction using any extractors specified in the configuration file. However, no data will be sent to the AWS environment specified in the configuration file and no data will be output to a file. This flag is intended to be used for debugging and ensuring extraction is successful before posting any data.
