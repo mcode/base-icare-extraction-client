@@ -106,7 +106,7 @@ Users can specify a different location for the file by using the `--run-log-file
 node src/cli.js --entries-filter --from-date YYYY-MM-DD --to-date YYY-MM-DD --run-log-filepath path/to/file.json
 ```
 
-## Test Flight
+## Testing Extraction and AWS Authentication
 
 In order to test the extraction of ICARE data without posting to an ICAREdata AWS environment, use the `--test-extraction` CLI option. For example:
 
@@ -115,6 +115,14 @@ node src/cli.js --test-extraction
 ```
 
 When this flag is used, the ICARE Extraction Client will execute full extraction using any extractors specified in the configuration file. However, no data will be sent to the AWS environment specified in the configuration file and no data will be output to a file. This flag is intended to be used for debugging and ensuring extraction is successful before posting any data.
+
+In order to test authentication to the AWS environment specified in the configuration file, use the `--test-aws-auth` CLI option. For example:
+
+```bash
+node src/cli.js --test-aws-auth
+```
+
+When this flag is used, the ICARE Extraction Client will try to connect to and authorize the AWS environment specified in the configuration file. However, no data will be extracted or posted. This flag is intended to be used for debugging and ensuring AWS is properly configured. Note that the `--test-aws-auth` and `--test-extraction` flags can be used together to execute the full AWS authentication and extraction process without actually posting any data to AWS.
 
 ## Masking Patient Data
 

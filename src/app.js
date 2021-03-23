@@ -6,7 +6,7 @@ const { logger } = require('mcode-extraction-framework');
 const { sendEmailNotification, zipErrors } = require('mcode-extraction-framework');
 const { extractDataForPatients } = require('mcode-extraction-framework');
 const { RunInstanceLogger } = require('mcode-extraction-framework');
-const { getMessagingClient, postExtractedData } = require('./icareFhirMessaging');
+const { checkAwsAuthentication, getMessagingClient, postExtractedData } = require('./icareFhirMessaging');
 
 function getConfig(pathToConfig) {
   // Checks pathToConfig points to valid JSON file
@@ -78,14 +78,21 @@ function getEffectiveFromDate(fromDate, runLogger) {
 // TODO: There is a lot of overlap with this application and the mcode application,
 // esp. when it comes to the configuration file helpers, log-file helpers and effective-date parsers;
 // can improve later
-async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries, testExtraction) {
+async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries, testExtraction, testAwsAuth) {
   try {
     if (debug) logger.level = 'debug';
     if (testExtraction) logger.info('test-extraction will perform extraction but will not post any data');
+    if (testAwsAuth) logger.info('test-aws-auth will authenticate to AWS but will not extract or post any data');
     // Don't require a run-logs file if we are extracting all-entries. Only required when using --entries-filter.
     if (!allEntries) checkLogFile(pathToRunLogs);
     const config = getConfig(pathToConfig);
     checkInputAndConfig(config, fromDate, toDate, testExtraction);
+
+    if (testAwsAuth) {
+      // Check AWS configuration info and that messaging client is created and can send messages
+      await checkAwsAuthentication(config);
+      if (!testExtraction) return; // Since we don't want to extract any data, return
+    }
 
     // Create and initialize client
     const icareClient = new Client(config);
