@@ -44,6 +44,12 @@ function checkInputAndConfig(config, fromDate, toDate, testFlight) {
 }
 
 function checkLogFile(pathToLogs) {
+  // If no custom log file was specified and no default log file exists, create one
+  if (pathToLogs === path.join('logs', 'run-logs.json') && !fs.existsSync(pathToLogs)) {
+    logger.info(`No log file found. Creating default log file at ${pathToLogs}`);
+    if (!fs.existsSync('logs')) fs.mkdirSync('logs');
+    fs.appendFileSync(pathToLogs, '[]');
+  }
   // Check that the given log file exists
   try {
     const logFileContent = JSON.parse(fs.readFileSync(pathToLogs));
