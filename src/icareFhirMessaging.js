@@ -38,7 +38,7 @@ async function checkAwsAuthentication(config) {
 
   // Ensure that the messagingClient can receive messages
   await checkMessagingClient(messagingClient);
-  logger.debug('AWS authenticated properly');
+  logger.info('AWS authenticated properly');
 }
 
 function makeUUIDFullUrl(uuid) {
