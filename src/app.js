@@ -6,7 +6,7 @@ const { logger } = require('mcode-extraction-framework');
 const { sendEmailNotification, zipErrors } = require('mcode-extraction-framework');
 const { extractDataForPatients } = require('mcode-extraction-framework');
 const { RunInstanceLogger } = require('mcode-extraction-framework');
-const { getMessagingClient, postExtractedData } = require('./icareFhirMessaging');
+const { checkAwsAuthentication, getMessagingClient, postExtractedData } = require('./icareFhirMessaging');
 
 function getConfig(pathToConfig) {
   // Checks pathToConfig points to valid JSON file
@@ -18,7 +18,7 @@ function getConfig(pathToConfig) {
   }
 }
 
-function checkInputAndConfig(config, fromDate, toDate, testFlight) {
+function checkInputAndConfig(config, fromDate, toDate, testExtraction) {
   // Check input args and needed config variables based on client being used
   const { patientIdCsvPath, awsConfig } = config;
 
@@ -38,7 +38,7 @@ function checkInputAndConfig(config, fromDate, toDate, testFlight) {
   }
 
   // AWS config is not required during test flight runs
-  if (!testFlight && !awsConfig) {
+  if (!testExtraction && !awsConfig) {
     throw new Error('awsConfig is required in config file');
   }
 }
@@ -78,14 +78,21 @@ function getEffectiveFromDate(fromDate, runLogger) {
 // TODO: There is a lot of overlap with this application and the mcode application,
 // esp. when it comes to the configuration file helpers, log-file helpers and effective-date parsers;
 // can improve later
-async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries, testFlight) {
+async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries, testExtraction, testAwsAuth) {
   try {
     if (debug) logger.level = 'debug';
-    if (testFlight) logger.info('test-flight will perform extraction but will not post any data');
+    if (testExtraction) logger.info('test-extraction will perform extraction but will not post any data');
+    if (testAwsAuth) logger.info('test-aws-auth will authenticate to AWS but will not extract or post any data');
     // Don't require a run-logs file if we are extracting all-entries. Only required when using --entries-filter.
     if (!allEntries) checkLogFile(pathToRunLogs);
     const config = getConfig(pathToConfig);
-    checkInputAndConfig(config, fromDate, toDate, testFlight);
+    checkInputAndConfig(config, fromDate, toDate, testExtraction);
+
+    if (testAwsAuth) {
+      // Check AWS configuration info and that messaging client is created and can send messages
+      await checkAwsAuthentication(config);
+      if (!testExtraction) return; // Since we don't want to extract any data, return
+    }
 
     // Create and initialize client
     const icareClient = new Client(config);
@@ -97,7 +104,7 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
 
     // Get messaging client for messaging ICAREPlatform
     let messagingClient = null;
-    if (!testFlight) messagingClient = getMessagingClient(config);
+    if (!testExtraction) messagingClient = getMessagingClient(config);
 
     // Get RunInstanceLogger for recording new runs and inferring dates from previous runs
     const runLogger = allEntries ? null : new RunInstanceLogger(pathToRunLogs);
@@ -111,23 +118,23 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
     // Post the data using the messagingClient
     let successfulMessagePost = true;
     let messagingErrors = {};
-    if (!testFlight) {
+    if (!testExtraction) {
       logger.info(`Posting data for ${patientIds.length} patients`);
       ({ successfulMessagePost, messagingErrors } = await postExtractedData(messagingClient, extractedData));
     }
 
-    // Don't send emails if we're in a test-flight run
+    // Don't send emails if we're in a test-extraction run
     // If we have notification information, send an emailNotification
     const { notificationInfo } = config;
-    if (!testFlight && notificationInfo) {
+    if (!testExtraction && notificationInfo) {
       const notificationErrors = zipErrors(totalExtractionErrors, messagingErrors);
       await sendEmailNotification(notificationInfo, notificationErrors, debug);
     }
 
-    // Only log successful runs if we're in a real run, not a test-flight run
+    // Only log successful runs if we're in a real run, not a test-extraction run
     // A run is successful and should be logged when both extraction finishes without fatal errors
     // and messages are posted without fatal errors
-    if (!testFlight && !allEntries && effectiveFromDate) {
+    if (!testExtraction && !allEntries && effectiveFromDate) {
       const successCondition = successfulExtraction && successfulMessagePost;
       if (successCondition) {
         runLogger.addRun(effectiveFromDate, effectiveToDate);

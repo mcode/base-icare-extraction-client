@@ -30,6 +30,17 @@ async function checkMessagingClient(messagingClient) {
   }
 }
 
+// This method is used to ensure AWS and FHIR messaging client are configured properly.
+// It is intended to be used with the --test-aws-auth flag. These functions are called separately during extraction.
+async function checkAwsAuthentication(config) {
+  // Ensure that we have the necessary aws info in the config file and that a MessagingClient can be made
+  const messagingClient = getMessagingClient(config);
+
+  // Ensure that the messagingClient can receive messages
+  await checkMessagingClient(messagingClient);
+  logger.info('AWS authenticated properly');
+}
+
 function makeUUIDFullUrl(uuid) {
   // Utility for ensuring UUID's follow a valid URL specification as described by FHIR R4“
   return `urn:uuid:${uuid}`;
@@ -124,6 +135,7 @@ async function postExtractedData(messagingClient, bundledData) {
 }
 
 module.exports = {
+  checkAwsAuthentication,
   checkMessagingClient,
   getMessagingClient,
   postExtractedData,

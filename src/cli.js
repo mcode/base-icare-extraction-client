@@ -14,14 +14,15 @@ program
   .option('-c --config-filepath <path>', 'Specify relative path to config to use:', defaultPathToConfig)
   .option('-r --run-log-filepath <path>', 'Specify relative path to log file of previous runs:', defaultPathToRunLogs)
   .option('-d, --debug', 'Output extra debugging information')
-  .option('--test-flight', 'Flag to test extraction without posting to AWS')
+  .option('--test-extraction', 'Flag to test extraction without posting to AWS')
+  .option('--test-aws-auth', 'Flag to test authentication to AWS without extracting any data')
   .parse(process.argv);
 
 const {
-  fromDate, toDate, configFilepath, runLogFilepath, debug, entriesFilter, testFlight,
+  fromDate, toDate, configFilepath, runLogFilepath, debug, entriesFilter, testExtraction, testAwsAuth,
 } = program;
 
 // Flag to extract allEntries, or just to use to-from dates
 const allEntries = !entriesFilter;
 
-icareApp(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, allEntries, testFlight);
+icareApp(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, allEntries, testExtraction, testAwsAuth);
