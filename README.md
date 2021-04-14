@@ -20,6 +20,12 @@ To see all the options that can be used with the ICARE client, run the following
 node src/cli.js --help
 ```
 
+The client can also be run by npm script:
+
+```bash
+npm start -- [options]
+```
+
 ## First Time User Guide
 
 ICARE Extraction Client requires that [Node.js](https://nodejs.org/en/) is installed on the user's system. Node.js >=12 is supported. The ICARE Extraction Client is distributed with all dependent packages installed.
