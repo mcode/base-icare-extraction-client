@@ -11,13 +11,13 @@ The ICAREdata Extraction Client supports extracting the ICAREdata data elements 
 Once you have exported CSV data and updated your configuration file, use the ICARE Extraction client by running the following:
 
 ```bash
-node src/cli.js [options]
+npm start -- [options]
 ```
 
 To see all the options that can be used with the ICARE client, run the following:
 
 ```bash
-node src/cli.js --help
+npm start -- --help
 ```
 
 ## First Time User Guide
@@ -103,7 +103,7 @@ Whenever the ICARE Extraction Client successfully runs with the `--entries-filte
 Users can specify a different location for the file by using the `--run-log-filepath <path>` CLI option. Users will need to create this file before running the ICARE Extraction Client with `--entries-filter` and a date range. Initially, this file's contents should be an empty array, `[]`. For example:
 
 ```bash
-node src/cli.js --entries-filter --from-date YYYY-MM-DD --to-date YYY-MM-DD --run-log-filepath path/to/file.json
+npm start -- --entries-filter --from-date YYYY-MM-DD --to-date YYY-MM-DD --run-log-filepath path/to/file.json
 ```
 
 ## Testing Extraction and AWS Authentication
@@ -111,7 +111,7 @@ node src/cli.js --entries-filter --from-date YYYY-MM-DD --to-date YYY-MM-DD --ru
 In order to test the extraction of ICARE data without posting to an ICAREdata AWS environment, use the `--test-extraction` CLI option. For example:
 
 ```bash
-node src/cli.js --test-extraction
+npm start -- --test-extraction
 ```
 
 When this flag is used, the ICARE Extraction Client will execute full extraction using any extractors specified in the configuration file. However, no data will be sent to the AWS environment specified in the configuration file and no data will be output to a file. This flag is intended to be used for debugging and ensuring extraction is successful before posting any data.
@@ -119,7 +119,7 @@ When this flag is used, the ICARE Extraction Client will execute full extraction
 In order to test authentication to the AWS environment specified in the configuration file, use the `--test-aws-auth` CLI option. For example:
 
 ```bash
-node src/cli.js --test-aws-auth
+npm start -- --test-aws-auth
 ```
 
 When this flag is used, the ICARE Extraction Client will try to connect to and authorize the AWS environment specified in the configuration file. However, no data will be extracted or posted. This flag is intended to be used for debugging and ensuring AWS is properly configured. Note that the `--test-aws-auth` and `--test-extraction` flags can be used together to execute the full AWS authentication and extraction process without actually posting any data to AWS.
@@ -154,7 +154,7 @@ If any filtering on data elements in CSV files is required, the `entries-filter`
 If a `from-date` is provided as an option when running the ICARE Extraction Client, it will be used to filter out any data elements that are recorded before that date based on the `dateRecorded` column in the CSV files. If a `to-date` is provided as an option, it will be used to filter out any data elements that are recorded after that date based on the `dateRecorded` column in the CSV files. If no `to-date` is provided, the default is today. If no `from-date` is provided, the ICARE Extraction Client will look to a run log file (details [above](#Logging-Successful-Extractions)) to find the most recent run and use the `to-date` of that run as the `from-date` for the current run, allowing users to only run the extraction on data elements that were not included in previous runs. If there are no previous run times logged, a `from-date` needs to be provided when running the extraction when the `entries-filter` option is provided. If the `entries-filter` option is not provided, any `from-date` and `to-date` options will be ignored, none of the data elements will be filtered by date, and a successful run will not be logged since there is no specified date range. An example running the client with the `from-date` and `to-date` is as follows:
 
 ```bash
-node src/cli.js --entries-filter --from-date <YYYY-MM-DD> --to-date <YYYY-MM-DD> --config-filepath <path>
+npm start -- --entries-filter --from-date <YYYY-MM-DD> --to-date <YYYY-MM-DD> --config-filepath <path>
 ```
 
 ## Developer Guide
