@@ -1,4 +1,4 @@
 mrn,trialSubjectID,enrollmentStatus,trialResearchID,trialStatus,trialResearchSystem
 123,subjectId-1,potential-candidate,researchId-1,approved,example-system
 456,subjectId-2,on-study-intervention,researchId-1,completed,example-system
-789,subjectId-3,on-study-observation,researchId-2,active,example-system
+789,subjectId-3,on-study-observation,researchId-2,active,
