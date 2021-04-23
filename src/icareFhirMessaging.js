@@ -108,6 +108,10 @@ async function postExtractedData(messagingClient, bundledData) {
   bundledData.forEach(async (bundle, i) => {
     messagingErrors[i] = [];
     try {
+      if (bundle && bundle.entry[1].resource.entry.length === 0) {
+        logger.warn(`No data was extracted for patient at row ${i + 1}, message will not be sent for this patient`);
+        return;
+      }
       await messagingClient.processMessage(bundle);
       logger.info(`SUCCESS - sent message for patient at row ${i + 1}`);
     } catch (e) {
