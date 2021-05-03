@@ -49,6 +49,9 @@ describe('icareFhirMessaging', () => {
   });
 
   describe('postExtractedData', () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
+    });
     it('should post data successfully when supplied appropriate message bundles', async () => {
       mockMessagingClient.canSendMessage.mockReturnValue(true);
       // postExtractedData expects an array of bundles, one for each patient
@@ -69,6 +72,16 @@ describe('icareFhirMessaging', () => {
       expect(successfulMessagePost).toEqual(false);
       const flattenedErrorValues = flattenErrorValues(messagingErrors);
       expect(flattenedErrorValues).not.toHaveLength(0);
+    });
+
+    it('should not attempt to post data when bundle does not contain extracted data', async () => {
+      mockMessagingClient.canSendMessage.mockReturnValue(true);
+
+      const bundleClone = _.cloneDeep(testBundle);
+      bundleClone.entry[1].resource.entry = [];
+
+      await postExtractedData(mockMessagingClient, [bundleClone]);
+      expect(mockMessagingClient.processMessage).toHaveBeenCalledTimes(0);
     });
   });
 });

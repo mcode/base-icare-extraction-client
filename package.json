@@ -8,10 +8,12 @@
     "Matthew Gramigna <mgramigna@mitre.org>",
     "Daniel Lee <daniellee@mitre.org>",
     "Dylan Mahalingam <kmahalingam@mitre.org>",
+    "Dylan Mendelowitz <dmendelowitz@mitre.org",
     "Dylan Phelan <dphelan@mitre.org>"
   ],
   "main": "src/",
   "scripts": {
+    "start": "node src/cli.js",
     "lint": "eslint \"./**/*.js\"",
     "lint-fix": "eslint \"./**/*.js\" --fix",
     "test": "cross-env LOGGING=none jest",
