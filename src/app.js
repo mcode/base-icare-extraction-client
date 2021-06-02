@@ -1,11 +1,9 @@
-const parse = require('csv-parse/lib/sync');
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
-const { logger } = require('mcode-extraction-framework');
-const { sendEmailNotification, zipErrors } = require('mcode-extraction-framework');
-const { extractDataForPatients } = require('mcode-extraction-framework');
-const { RunInstanceLogger } = require('mcode-extraction-framework');
+const {
+  logger, sendEmailNotification, zipErrors, extractDataForPatients, RunInstanceLogger, parsePatientIds,
+} = require('mcode-extraction-framework');
 const { checkAwsAuthentication, getMessagingClient, postExtractedData } = require('./icareFhirMessaging');
 
 function getConfig(pathToConfig) {
@@ -99,8 +97,7 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
     await icareClient.init();
 
     // Parse CSV for list of patient mrns
-    const patientIdsCsvPath = path.resolve(config.patientIdCsvPath);
-    const patientIds = parse(fs.readFileSync(patientIdsCsvPath, 'utf8'), { columns: true, bom: true }).map((row) => row.mrn);
+    const patientIds = parsePatientIds(config.patientIdCsvPath);
 
     // Get messaging client for messaging ICAREPlatform
     let messagingClient = null;
