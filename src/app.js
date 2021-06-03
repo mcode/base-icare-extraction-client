@@ -77,70 +77,64 @@ function getEffectiveFromDate(fromDate, runLogger) {
 // esp. when it comes to the configuration file helpers, log-file helpers and effective-date parsers;
 // can improve later
 async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries, testExtraction, testAwsAuth) {
-  try {
-    if (debug) logger.level = 'debug';
-    if (testExtraction) logger.info('test-extraction will perform extraction but will not post any data');
-    if (testAwsAuth) logger.info('test-aws-auth will authenticate to AWS but will not extract or post any data');
-    // Don't require a run-logs file if we are extracting all-entries. Only required when using --entries-filter.
-    if (!allEntries) checkLogFile(pathToRunLogs);
-    const config = getConfig(pathToConfig);
-    checkInputAndConfig(config, fromDate, toDate, testExtraction);
+  if (debug) logger.level = 'debug';
+  if (testExtraction) logger.info('test-extraction will perform extraction but will not post any data');
+  if (testAwsAuth) logger.info('test-aws-auth will authenticate to AWS but will not extract or post any data');
+  // Don't require a run-logs file if we are extracting all-entries. Only required when using --entries-filter.
+  if (!allEntries) checkLogFile(pathToRunLogs);
+  const config = getConfig(pathToConfig);
+  checkInputAndConfig(config, fromDate, toDate, testExtraction);
 
-    if (testAwsAuth) {
-      // Check AWS configuration info and that messaging client is created and can send messages
-      await checkAwsAuthentication(config);
-      if (!testExtraction) return; // Since we don't want to extract any data, return
+  if (testAwsAuth) {
+    // Check AWS configuration info and that messaging client is created and can send messages
+    await checkAwsAuthentication(config);
+    if (!testExtraction) return; // Since we don't want to extract any data, return
+  }
+
+  // Create and initialize client
+  const icareClient = new Client(config);
+  await icareClient.init();
+
+  // Parse CSV for list of patient mrns
+  const patientIds = parsePatientIds(config.patientIdCsvPath);
+
+  // Get messaging client for messaging ICAREPlatform
+  let messagingClient = null;
+  if (!testExtraction) messagingClient = getMessagingClient(config);
+
+  // Get RunInstanceLogger for recording new runs and inferring dates from previous runs
+  const runLogger = allEntries ? null : new RunInstanceLogger(pathToRunLogs);
+  const effectiveFromDate = allEntries ? null : getEffectiveFromDate(fromDate, runLogger);
+  const effectiveToDate = allEntries ? null : toDate;
+
+  // Extract the data
+  logger.info(`Extracting data for ${patientIds.length} patients`);
+  const { extractedData, successfulExtraction, totalExtractionErrors } = await extractDataForPatients(patientIds, icareClient, effectiveFromDate, effectiveToDate);
+
+  // Post the data using the messagingClient
+  let successfulMessagePost = true;
+  let messagingErrors = {};
+  if (!testExtraction) {
+    logger.info(`Posting data for ${patientIds.length} patients`);
+    ({ successfulMessagePost, messagingErrors } = await postExtractedData(messagingClient, extractedData));
+  }
+
+  // Don't send emails if we're in a test-extraction run
+  // If we have notification information, send an emailNotification
+  const { notificationInfo } = config;
+  if (!testExtraction && notificationInfo) {
+    const notificationErrors = zipErrors(totalExtractionErrors, messagingErrors);
+    await sendEmailNotification(notificationInfo, notificationErrors, debug);
+  }
+
+  // Only log successful runs if we're in a real run, not a test-extraction run
+  // A run is successful and should be logged when both extraction finishes without fatal errors
+  // and messages are posted without fatal errors
+  if (!testExtraction && !allEntries && effectiveFromDate) {
+    const successCondition = successfulExtraction && successfulMessagePost;
+    if (successCondition) {
+      runLogger.addRun(effectiveFromDate, effectiveToDate);
     }
-
-    // Create and initialize client
-    const icareClient = new Client(config);
-    await icareClient.init();
-
-    // Parse CSV for list of patient mrns
-    const patientIds = parsePatientIds(config.patientIdCsvPath);
-
-    // Get messaging client for messaging ICAREPlatform
-    let messagingClient = null;
-    if (!testExtraction) messagingClient = getMessagingClient(config);
-
-    // Get RunInstanceLogger for recording new runs and inferring dates from previous runs
-    const runLogger = allEntries ? null : new RunInstanceLogger(pathToRunLogs);
-    const effectiveFromDate = allEntries ? null : getEffectiveFromDate(fromDate, runLogger);
-    const effectiveToDate = allEntries ? null : toDate;
-
-    // Extract the data
-    logger.info(`Extracting data for ${patientIds.length} patients`);
-    const { extractedData, successfulExtraction, totalExtractionErrors } = await extractDataForPatients(patientIds, icareClient, effectiveFromDate, effectiveToDate);
-
-    // Post the data using the messagingClient
-    let successfulMessagePost = true;
-    let messagingErrors = {};
-    if (!testExtraction) {
-      logger.info(`Posting data for ${patientIds.length} patients`);
-      ({ successfulMessagePost, messagingErrors } = await postExtractedData(messagingClient, extractedData));
-    }
-
-    // Don't send emails if we're in a test-extraction run
-    // If we have notification information, send an emailNotification
-    const { notificationInfo } = config;
-    if (!testExtraction && notificationInfo) {
-      const notificationErrors = zipErrors(totalExtractionErrors, messagingErrors);
-      await sendEmailNotification(notificationInfo, notificationErrors, debug);
-    }
-
-    // Only log successful runs if we're in a real run, not a test-extraction run
-    // A run is successful and should be logged when both extraction finishes without fatal errors
-    // and messages are posted without fatal errors
-    if (!testExtraction && !allEntries && effectiveFromDate) {
-      const successCondition = successfulExtraction && successfulMessagePost;
-      if (successCondition) {
-        runLogger.addRun(effectiveFromDate, effectiveToDate);
-      }
-    }
-  } catch (e) {
-    logger.error(e.message);
-    logger.debug(e.stack);
-    process.exit(1);
   }
 }
 
