@@ -41,38 +41,6 @@ function checkInputAndConfig(config, fromDate, toDate, testExtraction) {
   }
 }
 
-function checkLogFile(pathToLogs) {
-  // If no custom log file was specified and no default log file exists, create one
-  if (path.resolve(pathToLogs) === path.resolve(path.join('logs', 'run-logs.json')) && !fs.existsSync(pathToLogs)) {
-    logger.info(`No log file found. Creating default log file at ${pathToLogs}`);
-    if (!fs.existsSync('logs')) fs.mkdirSync('logs');
-    fs.appendFileSync(pathToLogs, '[]');
-  }
-  // Check that the given log file exists
-  try {
-    const logFileContent = JSON.parse(fs.readFileSync(pathToLogs));
-    if (!Array.isArray(logFileContent)) throw new Error('Log file needs to be an array.');
-  } catch (err) {
-    logger.error(`The provided filepath to a LogFile, ${pathToLogs}, did not point to a valid JSON file. Create a json file with an empty array at this location.`);
-    throw new Error(err.message);
-  }
-}
-
-// Use previous runs to infer a valid fromDate if none was provided
-function getEffectiveFromDate(fromDate, runLogger) {
-  if (fromDate) return fromDate;
-
-  // Use the most recent ToDate
-  logger.info('No fromDate was provided, inferring an effectiveFromDate');
-  const effectiveFromDate = runLogger.getMostRecentToDate();
-  logger.info(`effectiveFromDate: ${effectiveFromDate}`);
-  if (!effectiveFromDate) {
-    throw new Error('no valid fromDate was supplied, and there are no log records from which we could pull a fromDate');
-  }
-
-  return effectiveFromDate;
-}
-
 // TODO: There is a lot of overlap with this application and the mcode application,
 // esp. when it comes to the configuration file helpers, log-file helpers and effective-date parsers;
 // can improve later
@@ -80,8 +48,6 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
   if (debug) logger.level = 'debug';
   if (testExtraction) logger.info('test-extraction will perform extraction but will not post any data');
   if (testAwsAuth) logger.info('test-aws-auth will authenticate to AWS but will not extract or post any data');
-  // Don't require a run-logs file if we are extracting all-entries. Only required when using --entries-filter.
-  if (!allEntries) checkLogFile(pathToRunLogs);
   const config = getConfig(pathToConfig);
   checkInputAndConfig(config, fromDate, toDate, testExtraction);
 
@@ -104,7 +70,7 @@ async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, d
 
   // Get RunInstanceLogger for recording new runs and inferring dates from previous runs
   const runLogger = allEntries ? null : new RunInstanceLogger(pathToRunLogs);
-  const effectiveFromDate = allEntries ? null : getEffectiveFromDate(fromDate, runLogger);
+  const effectiveFromDate = allEntries ? null : runLogger.getEffectiveFromDate(fromDate, runLogger);
   const effectiveToDate = allEntries ? null : toDate;
 
   // Extract the data
