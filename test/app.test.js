@@ -3,22 +3,8 @@ const testConfig = require('./fixtures/test-config.json');
 
 const appUtils = rewire('../src/app.js');
 const checkInputAndConfig = appUtils.__get__('checkInputAndConfig');
-const getConfig = appUtils.__get__('getConfig');
 
 describe('appUtils', () => {
-  describe('getConfig', () => {
-    const pathToConfig = 'test/fixtures/test-config.json';
-
-    it('should throw error when pathToConfig does not point to valid JSON file.', () => {
-      expect(() => getConfig()).toThrowError();
-    });
-
-    it('should return test config', () => {
-      const config = getConfig(pathToConfig);
-      expect(config).toEqual(testConfig);
-    });
-  });
-
   describe('checkInputAndConfig', () => {
     it('should throw error when fromDate is invalid.', () => {
       expect(() => checkInputAndConfig(testConfig, '2020-06-31')).toThrowError('-f/--from-date is not a valid date.');

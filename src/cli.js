@@ -1,6 +1,6 @@
 const path = require('path');
 const program = require('commander');
-const { logger } = require('mcode-extraction-framework');
+const { logger, getConfig } = require('mcode-extraction-framework');
 const { ICARECSVClient } = require('./ICARECSVClient');
 const { icareApp } = require('./app');
 
@@ -28,7 +28,8 @@ const allEntries = !entriesFilter;
 
 async function runApp() {
   try {
-    await icareApp(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, allEntries, testExtraction, testAwsAuth);
+    const config = getConfig(configFilepath);
+    await icareApp(ICARECSVClient, fromDate, toDate, config, runLogFilepath, debug, allEntries, testExtraction, testAwsAuth);
   } catch (e) {
     if (debug) logger.level = 'debug';
     logger.error(e.message);

@@ -1,20 +1,8 @@
-const fs = require('fs');
-const path = require('path');
 const moment = require('moment');
 const {
   logger, sendEmailNotification, zipErrors, extractDataForPatients, RunInstanceLogger, parsePatientIds,
 } = require('mcode-extraction-framework');
 const { checkAwsAuthentication, getMessagingClient, postExtractedData } = require('./icareFhirMessaging');
-
-function getConfig(pathToConfig) {
-  // Checks pathToConfig points to valid JSON file
-  const fullPath = path.resolve(pathToConfig);
-  try {
-    return JSON.parse(fs.readFileSync(fullPath));
-  } catch (err) {
-    throw new Error(`The provided filepath to a configuration file ${pathToConfig}, full path ${fullPath} did not point to a valid JSON file.`);
-  }
-}
 
 function checkInputAndConfig(config, fromDate, toDate, testExtraction) {
   // Check input args and needed config variables based on client being used
@@ -44,11 +32,10 @@ function checkInputAndConfig(config, fromDate, toDate, testExtraction) {
 // TODO: There is a lot of overlap with this application and the mcode application,
 // esp. when it comes to the configuration file helpers, log-file helpers and effective-date parsers;
 // can improve later
-async function icareApp(Client, fromDate, toDate, pathToConfig, pathToRunLogs, debug, allEntries, testExtraction, testAwsAuth) {
+async function icareApp(Client, fromDate, toDate, config, pathToRunLogs, debug, allEntries, testExtraction, testAwsAuth) {
   if (debug) logger.level = 'debug';
   if (testExtraction) logger.info('test-extraction will perform extraction but will not post any data');
   if (testAwsAuth) logger.info('test-aws-auth will authenticate to AWS but will not extract or post any data');
-  const config = getConfig(pathToConfig);
   checkInputAndConfig(config, fromDate, toDate, testExtraction);
 
   if (testAwsAuth) {
