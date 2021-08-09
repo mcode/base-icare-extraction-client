@@ -1,5 +1,6 @@
 const path = require('path');
 const program = require('commander');
+const { logger, getConfig } = require('mcode-extraction-framework');
 const { ICARECSVClient } = require('./ICARECSVClient');
 const { icareApp } = require('./app');
 
@@ -25,4 +26,16 @@ const {
 // Flag to extract allEntries, or just to use to-from dates
 const allEntries = !entriesFilter;
 
-icareApp(ICARECSVClient, fromDate, toDate, configFilepath, runLogFilepath, debug, allEntries, testExtraction, testAwsAuth);
+async function runApp() {
+  try {
+    const config = getConfig(configFilepath);
+    await icareApp(ICARECSVClient, fromDate, toDate, config, runLogFilepath, debug, allEntries, testExtraction, testAwsAuth);
+  } catch (e) {
+    if (debug) logger.level = 'debug';
+    logger.error(e.message);
+    logger.debug(e.stack);
+    process.exit(1);
+  }
+}
+
+runApp();
