@@ -4,7 +4,8 @@ The ICAREdata Extraction Client supports extracting the ICAREdata data elements 
 
 ## Prerequisites
 
-- [Node.js >= 12](https://nodejs.org/en/)
+- [Node.js v14.18.1 (LTS as of Oct 2021)](https://nodejs.org/en/)
+  - npm v6.14.15 (included in LTS of Oct 2021)
 
 ## General Usage
 
