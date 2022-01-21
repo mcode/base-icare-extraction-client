@@ -4,7 +4,8 @@ The ICAREdata Extraction Client supports extracting the ICAREdata data elements 
 
 ## Prerequisites
 
-- [Node.js >= 12](https://nodejs.org/en/)
+- [Node.js v14.18.1 (LTS as of Oct 2021)](https://nodejs.org/en/)
+  - npm v6.14.15 (included in LTS of Oct 2021)
 
 ## General Usage
 
@@ -127,7 +128,7 @@ When this flag is used, the ICARE Extraction Client will try to connect to and a
 ## Masking Patient Data
 
 Patient data can be masked within the extracted `Patient` resource. When masked, the value of the field will be replaced with a [Data Absent Reason extension](https://www.hl7.org/fhir/extension-data-absent-reason.html) with the code `masked`.
-Patient properties that can be masked are: `gender`, `mrn`, `name`, `address`, `birthDate`, `language`, `ethnicity`, `birthsex`, and `race`.
+Patient properties that can be masked are: `genderAndSex`, `mrn`, `name`, `address`, `birthDate`, `language`, `ethnicity`, `race`, `telecom`, `multipleBirth`, `photo`, `contact`, `generalPractitioner`, `managingOrganization`, and `link`.
 To mask a property, provide an array of the properties to mask in the `constructorArgs` of the Patient extractor. For example, the following configuration can be used to mask `address` and `birthDate`:
 
 ```bash
@@ -140,6 +141,19 @@ To mask a property, provide an array of the properties to mask in the `construct
   }
 }
 ```
+
+Alternatively, providing a string with a value of `all` in the `constructorArgs` of the Patient extractor will mask all of the supported properties listed above. The following configuration can be used to mask all properties of the `Patient` resource, rather than listing each individual property:
+
+ ```bash
+ {
+   "label": "patient",
+   "type": "CSVPatientExtractor",
+   "constructorArgs": {
+     "filePath": "./data/patient-information.csv"
+     "mask": "all"
+   }
+ }
+ ```
 
 ## Extraction Date Range
 
