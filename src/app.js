@@ -7,11 +7,7 @@ const {
   RunInstanceLogger,
   parsePatientIds,
 } = require('mcode-extraction-framework');
-const {
-  checkAwsAuthentication,
-  getMessagingClient,
-  postExtractedData,
-} = require('./icareFhirMessaging');
+const { checkAwsAuthentication, getMessagingClient, postExtractedData } = require('./icareFhirMessaging');
 
 function checkInputAndConfig(config, fromDate, toDate, testExtraction) {
   // Check input args and needed config variables based on client being used
@@ -50,17 +46,11 @@ async function icareApp(
   debug,
   allEntries,
   testExtraction,
-  testAwsAuth
+  testAwsAuth,
 ) {
   if (debug) logger.level = 'debug';
-  if (testExtraction)
-    logger.info(
-      'test-extraction will perform extraction but will not post any data'
-    );
-  if (testAwsAuth)
-    logger.info(
-      'test-aws-auth will authenticate to AWS but will not extract or post any data'
-    );
+  if (testExtraction) logger.info('test-extraction will perform extraction but will not post any data');
+  if (testAwsAuth) logger.info('test-aws-auth will authenticate to AWS but will not extract or post any data');
   checkInputAndConfig(config, fromDate, toDate, testExtraction);
 
   if (testAwsAuth) {
@@ -74,19 +64,9 @@ async function icareApp(
   await icareClient.init();
 
   // Parse CSV for list of patient mrns
-  const dataDirectory =
-    config.commonExtractorArgs && config.commonExtractorArgs.dataDirectory;
-  const parserOptions =
-    config.commonExtractorArgs &&
-    config.commonExtractorArgs.csvParse &&
-    config.commonExtractorArgs.csvParse.options
-      ? config.commonExtractorArgs.csvParse.options
-      : {};
-  const patientIds = parsePatientIds(
-    config.patientIdCsvPath,
-    dataDirectory,
-    parserOptions
-  );
+  const dataDirectory = config.commonExtractorArgs && config.commonExtractorArgs.dataDirectory;
+  const parserOptions = config.commonExtractorArgs && config.commonExtractorArgs.csvParse && config.commonExtractorArgs.csvParse.options ? config.commonExtractorArgs.csvParse.options : {};
+  const patientIds = parsePatientIds(config.patientIdCsvPath, dataDirectory, parserOptions);
 
   // Get messaging client for messaging ICAREPlatform
   let messagingClient = null;
@@ -94,40 +74,26 @@ async function icareApp(
 
   // Get RunInstanceLogger for recording new runs and inferring dates from previous runs
   const runLogger = allEntries ? null : new RunInstanceLogger(pathToRunLogs);
-  const effectiveFromDate = allEntries
-    ? null
-    : runLogger.getEffectiveFromDate(fromDate, runLogger);
+  const effectiveFromDate = allEntries ? null : runLogger.getEffectiveFromDate(fromDate, runLogger);
   const effectiveToDate = allEntries ? null : toDate;
 
   // Extract the data
   logger.info(`Extracting data for ${patientIds.length} patients`);
-  const { extractedData, successfulExtraction, totalExtractionErrors } =
-    await extractDataForPatients(
-      patientIds,
-      icareClient,
-      effectiveFromDate,
-      effectiveToDate
-    );
+  const { extractedData, successfulExtraction, totalExtractionErrors } = await extractDataForPatients(patientIds, icareClient, effectiveFromDate, effectiveToDate);
 
   // Post the data using the messagingClient
   let successfulMessagePost = true;
   let messagingErrors = {};
   if (!testExtraction) {
     logger.info(`Posting data for ${patientIds.length} patients`);
-    ({ successfulMessagePost, messagingErrors } = await postExtractedData(
-      messagingClient,
-      extractedData
-    ));
+    ({ successfulMessagePost, messagingErrors } = await postExtractedData(messagingClient, extractedData));
   }
 
   // Don't send emails if we're in a test-extraction run
   // If we have notification information, send an emailNotification
   const { notificationInfo } = config;
   if (!testExtraction && notificationInfo) {
-    const notificationErrors = zipErrors(
-      totalExtractionErrors,
-      messagingErrors
-    );
+    const notificationErrors = zipErrors(totalExtractionErrors, messagingErrors);
     await sendEmailNotification(notificationInfo, notificationErrors, debug);
   }
 
