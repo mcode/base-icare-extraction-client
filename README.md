@@ -51,9 +51,10 @@ More information on the data that should be provided in each CSV file can be fou
 After exporting your CSV files to the `data` directory, kickstart the creation of a configuration file by renaming the provided `csv.config.example.json` to `csv.config.json`. Then, ensure the following configuration parameters are properly set:
 
 1. `patientIdCsvPath` should provide a file path to a CSV file containing MRN's for relevant patients;
-2. For each extractor, `filePath:` should provide a file path to a CSV file containing that corresponding extractor's data;
-3. For the ClinicalInformationExtractor, `clinicalSiteID` should correspond to the researchId used by your clinical site in support of the ICAREdata trial;
-4. The `awsConfig` object needs to be updated to include the following fields with information that is sent separately by the ICAREdata team:
+2. `commonExtractorArgs.dataDirectory` should correspond to an absolute path to the dataDirectory containing all your exported CSV files;
+3. For each extractor, `fileName` should correspond to the file name this extractor should be reading from. Note: combining the `dataDirectory` above and `fileName` should resolve to a file on disk containing this corresponding extractor's data;
+4. For the ClinicalInformationExtractor, `clinicalSiteID` should correspond to the researchId used by your clinical site in support of the ICAREdata trial;
+5. The `awsConfig` object needs to be updated to include the following fields with information that is sent separately by the ICAREdata team:
    - A `baseURL` field that indicates the base URL of the server to post messages to.
    - A `clientId` field containing the client ID that is registered for the ICAREdata OAuth2 framework.
    - An `aud` field containing the audience parameter that is registered for the client in the ICAREdata OAuth2 framework.
@@ -61,6 +62,7 @@ After exporting your CSV files to the `data` directory, kickstart the creation o
      - Two fields - `pkcs12` and `pkcs12Pass` - where the former is a filepath to your locally saved P12 file and the latter is the password for opening that file, or;
      - A `jwk` field, containing a JWK-JSON object configured to contain the relevant private-key information.
 
+**Note**: Previous versions of the extraction client suggested using a `filePath` property for each extractor; while this property should still work without issue, the recommended approach is to use a common dataDirectory for all CSV files and to have each Extractor call out the name of the CSV file they need.
 
 For instructions on setting up an email notification trigger whenever an error is encountered in extraction, see the [Email Notification](#Email-Notification) section below.`
 
@@ -91,7 +93,7 @@ In order to send an email, users must specify the hostname or IP address of an S
 - `port`: `<number>` (Optional) The port to connect to (defaults to 587)
 - `to`: `<string[]>` Comma separated list or an array of recipients email addresses that will appear on the _To:_ field
 - `from`: `<string>` (Optional) The email address of the sender. All email addresses can be plain `'sender@server.com'` or formatted `'"Sender Name" sender@server.com'` (defaults to mcode-extraction-errors@mitre.org, which cannot receive reply emails)
-- `tlsRejectUnauthorized`: `<boolean>` (Optional) A boolean value to set the [node.js TLSSocket option](https://nodejs.org/api/tls.html#tls_class_tls_tlssocket) for rejecting any unauthorized connections, `tls.rejectUnauthorized`.  (defaults to `true`)
+- `tlsRejectUnauthorized`: `<boolean>` (Optional) A boolean value to set the [node.js TLSSocket option](https://nodejs.org/api/tls.html#tls_class_tls_tlssocket) for rejecting any unauthorized connections, `tls.rejectUnauthorized`. (defaults to `true`)
 
 An example of this object can be found in [`config/csv.config.example.json`](config/csv.config.example.json).
 
@@ -136,7 +138,7 @@ To mask a property, provide an array of the properties to mask in the `construct
   "label": "patient",
   "type": "CSVPatientExtractor",
   "constructorArgs": {
-    "filePath": "./data/patient-information.csv"
+    "fileName": "patient-information.csv"
     "mask": ["address", "birthDate"]
   }
 }
@@ -144,16 +146,16 @@ To mask a property, provide an array of the properties to mask in the `construct
 
 Alternatively, providing a string with a value of `all` in the `constructorArgs` of the Patient extractor will mask all of the supported properties listed above. The following configuration can be used to mask all properties of the `Patient` resource, rather than listing each individual property:
 
- ```bash
- {
-   "label": "patient",
-   "type": "CSVPatientExtractor",
-   "constructorArgs": {
-     "filePath": "./data/patient-information.csv"
-     "mask": "all"
-   }
- }
- ```
+```bash
+{
+  "label": "patient",
+  "type": "CSVPatientExtractor",
+  "constructorArgs": {
+    "fileName": "patient-information.csv"
+    "mask": "all"
+  }
+}
+```
 
 ## Extraction Date Range
 
@@ -183,6 +185,23 @@ cat -v <file.csv>
 
 If there is an unexpected symbol at the beginning of the file, then there may be a byte order marker that needs to be removed.
 
+#### Troubleshooting Additional Errors
+
+The extraction client uses the node `csv-parse` library to parse specified CSV files. [Parsing options for the `csv-parse` library](https://csv.js.org/parse/options/) can be included in the configuration file within the `commonExtractorArgs.csvParse.options` section. For example, the following configuration will pass the `to` option to the `csv-parse` module, causing the extraction client to only read CSV files up to the specified line number:
+
+```
+"commonExtractorArgs": {
+    "dataDirectory": "/Users/*****/Documents/dataDirectory",
+    "csvParse": {
+      "options": {
+        "to": 3
+      }
+    }
+  },
+```
+
+**Note:** The extraction client enables the `bom`, `skip_empty_lines`, and `skip_lines_with_empty_values` options by default, including these options in the configuration file will cause these default options to be overwritten.
+
 ## Developer Guide
 
 After making changes to any of the dependent libraries, including the [mCODE Extraction Framework](https://github.com/mcode/mcode-extraction-framework), you will need to run the following command ensure you have the updated dependencies:
@@ -196,7 +215,6 @@ If you need to update the version of a package (e.g. update `mcode-extraction-fr
 ```bash
 npm upgrade <pkg-name>
 ```
-
 
 ## License
 

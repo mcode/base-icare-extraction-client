@@ -1,6 +1,8 @@
 {
   "patientIdCsvPath": "./data/patient-mrns.csv",
-  "commonExtractorArgs": {},
+  "commonExtractorArgs": {
+    "dataDirectory": "Users/YourAccount/absolute/path/to/data/directory"
+  },
   "notificationInfo": {
     "host": "smtp.example.com",
     "port": 587,
@@ -16,28 +18,28 @@
       "label": "patient",
       "type": "CSVPatientExtractor",
       "constructorArgs": {
-        "filePath": "./data/patient-information.csv"
+        "fileName": "patient-information.csv"
       }
     },
     {
       "label": "condition",
       "type": "CSVConditionExtractor",
       "constructorArgs": {
-        "filePath": "./data/condition-information.csv"
+        "fileName": "condition-information.csv"
       }
     },
     {
       "label": "cancerDiseaseStatus",
       "type": "CSVCancerDiseaseStatusExtractor",
       "constructorArgs": {
-        "filePath": "./data/cancer-disease-status-information.csv"
+        "fileName": "cancer-disease-status-information.csv"
       }
     },
     {
       "label": "clinicalTrialInformation",
       "type": "CSVClinicalTrialInformationExtractor",
       "constructorArgs": {
-        "filePath": "./data/clinical-trial-information.csv",
+        "fileName": "clinical-trial-information.csv",
         "clinicalSiteID": "example-site-id"
       }
     },
@@ -45,7 +47,7 @@
       "label": "treatmentPlanChange",
       "type": "CSVTreatmentPlanChangeExtractor",
       "constructorArgs": {
-        "filePath": "./data/treatment-plan-change-information.csv"
+        "fileName": "treatment-plan-change-information.csv"
       }
     }
   ],
