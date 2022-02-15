@@ -19,6 +19,14 @@ const testConfig = {
         filePath: path.join(__dirname, './fixtures/csv/example-condition.csv'),
       },
     },
+    {
+      label: 'patient',
+      type: 'CSVPatientExtractor',
+      constructorArgs: {
+        // This CSV path doesn't point at actual data, but a valid file with valid columns is needed to avoid CSV parser and CSV validation errors
+        filePath: path.join(__dirname, './fixtures/csv/example-patient.csv'),
+      },
+    },
   ],
 };
 
