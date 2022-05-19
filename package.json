@@ -24,10 +24,10 @@
     "commander": "^4.1.1",
     "cross-env": "^7.0.1",
     "csv-parse": "^4.8.9",
-    "fhir-messaging-client": "git+https://github.com/ICAREdata/fhir-messaging-client.git#develop",
+    "fhir-messaging-client": "git+https://github.com/ICAREdata/fhir-messaging-client.git",
     "fhirpath": "^2.3.0",
     "lodash": "^4.17.21",
-    "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git#develop",
+    "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git",
     "moment": "^2.29.3",
     "nodemailer": "^6.7.2",
     "uuid": "^7.0.2"
