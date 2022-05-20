@@ -1,6 +1,6 @@
 {
   "name": "base-icare-extraction-client",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "",
   "contributors": [
     "Julia Afeltra <jafeltra@mitre.org>",
@@ -28,7 +28,7 @@
     "fhirpath": "^2.3.0",
     "lodash": "^4.17.21",
     "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git",
-    "moment": "^2.24.0",
+    "moment": "^2.29.3",
     "nodemailer": "^6.7.2",
     "uuid": "^7.0.2"
   },
