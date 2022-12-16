@@ -27,7 +27,7 @@
     "fhir-messaging-client": "git+https://github.com/ICAREdata/fhir-messaging-client.git",
     "fhirpath": "^2.3.0",
     "lodash": "^4.17.21",
-    "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git",
+    "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git#develop",
     "moment": "^2.29.4",
     "nodemailer": "^6.7.2",
     "uuid": "^7.0.2"
