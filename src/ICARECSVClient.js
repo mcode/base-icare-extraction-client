@@ -2,6 +2,7 @@ const {
   BaseClient,
   CSVCancerDiseaseStatusExtractor,
   CSVConditionExtractor,
+  CSVCTCAdverseEventExtractor,
   CSVClinicalTrialInformationExtractor,
   CSVPatientExtractor,
   CSVTreatmentPlanChangeExtractor,
@@ -16,6 +17,7 @@ class ICARECSVClient extends BaseClient {
       CSVCancerDiseaseStatusExtractor,
       CSVConditionExtractor,
       CSVClinicalTrialInformationExtractor,
+      CSVCTCAdverseEventExtractor,
       CSVPatientExtractor,
       CSVTreatmentPlanChangeExtractor,
     );
@@ -26,6 +28,7 @@ class ICARECSVClient extends BaseClient {
       { type: 'CSVPatientExtractor', dependencies: [] },
       { type: 'CSVConditionExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVCancerDiseaseStatusExtractor', dependencies: ['CSVPatientExtractor'] },
+      { type: 'CSVCTCAdverseEventExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVClinicalTrialInformationExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVTreatmentPlanChangeExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVStagingExtractor', dependencies: ['CSVPatientExtractor'] },
