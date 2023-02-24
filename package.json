@@ -13,11 +13,15 @@
   ],
   "main": "src/",
   "scripts": {
+    "preinstall": "npx npm-force-resolutions",
     "start": "node src/cli.js",
     "lint": "eslint \"./**/*.js\"",
     "lint-fix": "eslint \"./**/*.js\" --fix",
     "test": "cross-env LOGGING=none jest",
     "test:watch": "cross-env LOGGING=none jest --watchAll"
+  },
+  "resolutions": {
+    "antlr4": "4.8.0"
   },
   "license": "Apache-2.0",
   "dependencies": {
