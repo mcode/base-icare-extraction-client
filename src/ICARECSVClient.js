@@ -1,10 +1,16 @@
 const {
   BaseClient,
+  CSVAdverseEventExtractor,
   CSVCancerDiseaseStatusExtractor,
+  CSVCancerRelatedMedicationAdministrationExtractor,
+  CSVCancerRelatedMedicationRequestExtractor,
+  CSVClinicalTrialInformationExtractor,
   CSVConditionExtractor,
   CSVCTCAdverseEventExtractor,
-  CSVClinicalTrialInformationExtractor,
+  CSVObservationExtractor,
   CSVPatientExtractor,
+  CSVProcedureExtractor,
+  CSVStagingExtractor,
   CSVTreatmentPlanChangeExtractor,
   sortExtractors,
 } = require('mcode-extraction-framework');
@@ -14,11 +20,17 @@ class ICARECSVClient extends BaseClient {
   constructor({ extractors, commonExtractorArgs }) {
     super();
     this.registerExtractors(
+      CSVAdverseEventExtractor,
       CSVCancerDiseaseStatusExtractor,
-      CSVConditionExtractor,
+      CSVCancerRelatedMedicationAdministrationExtractor,
+      CSVCancerRelatedMedicationRequestExtractor,
       CSVClinicalTrialInformationExtractor,
+      CSVConditionExtractor,
       CSVCTCAdverseEventExtractor,
+      CSVObservationExtractor,
       CSVPatientExtractor,
+      CSVProcedureExtractor,
+      CSVStagingExtractor,
       CSVTreatmentPlanChangeExtractor,
     );
     // Store the extractors defined by the configuration file as local state
@@ -28,10 +40,15 @@ class ICARECSVClient extends BaseClient {
       { type: 'CSVPatientExtractor', dependencies: [] },
       { type: 'CSVConditionExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVCancerDiseaseStatusExtractor', dependencies: ['CSVPatientExtractor'] },
-      { type: 'CSVCTCAdverseEventExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVClinicalTrialInformationExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVTreatmentPlanChangeExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVStagingExtractor', dependencies: ['CSVPatientExtractor'] },
+      { type: 'CSVCancerRelatedMedicationAdministrationExtractor', dependencies: ['CSVPatientExtractor'] },
+      { type: 'CSVCancerRelatedMedicationRequestExtractor', dependencies: ['CSVPatientExtractor'] },
+      { type: 'CSVProcedureExtractor', dependencies: ['CSVPatientExtractor'] },
+      { type: 'CSVObservationExtractor', dependencies: ['CSVPatientExtractor'] },
+      { type: 'CSVAdverseEventExtractor', dependencies: ['CSVPatientExtractor'] },
+      { type: 'CSVCTCAdverseEventExtractor', dependencies: ['CSVPatientExtractor'] },
     ];
     // Sort extractors based on order and dependencies
     this.extractorConfig = sortExtractors(this.extractorConfig, dependencyInfo);
