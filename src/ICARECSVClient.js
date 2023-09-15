@@ -7,6 +7,7 @@ const {
   CSVClinicalTrialInformationExtractor,
   CSVConditionExtractor,
   CSVCTCAdverseEventExtractor,
+  CSVEncounterExtractor,
   CSVObservationExtractor,
   CSVPatientExtractor,
   CSVProcedureExtractor,
@@ -27,6 +28,7 @@ class ICARECSVClient extends BaseClient {
       CSVClinicalTrialInformationExtractor,
       CSVConditionExtractor,
       CSVCTCAdverseEventExtractor,
+      CSVEncounterExtractor,
       CSVObservationExtractor,
       CSVPatientExtractor,
       CSVProcedureExtractor,
@@ -49,6 +51,7 @@ class ICARECSVClient extends BaseClient {
       { type: 'CSVObservationExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVAdverseEventExtractor', dependencies: ['CSVPatientExtractor'] },
       { type: 'CSVCTCAdverseEventExtractor', dependencies: ['CSVPatientExtractor'] },
+      { type: 'CSVEncounterExtractor', dependencies: ['CSVPatientExtractor'] },
     ];
     // Sort extractors based on order and dependencies
     this.extractorConfig = sortExtractors(this.extractorConfig, dependencyInfo);
