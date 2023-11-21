@@ -28,10 +28,11 @@
     "commander": "^4.1.1",
     "cross-env": "^7.0.1",
     "csv-parse": "^4.8.9",
+    "fhir-mapper": "git+https://github.com/standardhealth/fhir-mapper.git",
     "fhir-messaging-client": "git+https://github.com/ICAREdata/fhir-messaging-client.git",
     "fhirpath": "^2.3.0",
     "lodash": "^4.17.21",
-    "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git",
+    "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git#export-extractor-list",
     "moment": "^2.29.4",
     "nodemailer": "^6.7.2",
     "uuid": "^7.0.2"
