@@ -21,7 +21,7 @@
     "test:watch": "cross-env LOGGING=none jest --watchAll"
   },
   "resolutions": {
-    "antlr4": "4.8.0"
+    "antlr4": "4.13.1"
   },
   "license": "Apache-2.0",
   "dependencies": {
@@ -29,9 +29,9 @@
     "cross-env": "^7.0.1",
     "csv-parse": "^4.8.9",
     "fhir-messaging-client": "git+https://github.com/ICAREdata/fhir-messaging-client.git",
-    "fhirpath": "^2.3.0",
+    "fhirpath": "3.8.1",
     "lodash": "^4.17.21",
-    "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git",
+    "mcode-extraction-framework": "git+https://github.com/mcode/mcode-extraction-framework.git#development",
     "moment": "^2.29.4",
     "nodemailer": "^6.7.2",
     "uuid": "^7.0.2"
